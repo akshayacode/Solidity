@@ -87,20 +87,20 @@ contract P2PLending {
         hasOngoingApplication[msg.sender] = false;
         balances[msg.sender] = 0; // Init balance
     }
-    function viewBalance() public returns (uint256){
+    function viewBalance() public view returns (uint256){
         return balances[msg.sender];
     }
-    function deposit(uint amount) public {
+    function deposit(uint amount) public payable {
         balances[msg.sender] += amount;
     }
-    function withdraw(uint amount) public returns (uint) {
+    function withdraw(uint amount) public payable returns(uint) {
         require(amount <= balances[msg.sender]);
         balances[msg.sender] -= amount;
         return amount;
     }
-    function transfer(address giver, address taker, uint amount) public{
-        require(balances[giver] >= amount);
-        balances[giver] -= amount;
+    function transfer(address taker, uint amount) public payable{
+        require(balances[msg.sender] >= amount);
+        balances[msg.sender] -= amount;
         balances[taker] += amount;
     }
     function createApplication(uint duration, uint interest_rate, uint credit_amount, string memory otherData) public {
@@ -207,7 +207,7 @@ contract P2PLending {
             hasOngoingLoan[loan.investor] = false;
         }
     }
-    function ifApplicationOpen(uint index) public returns (bool){
+    function ifApplicationOpen(uint index) public view returns (bool){
         LoanApplication storage app = applications[index];
         if(app.openApp) return true; else return false;
     }
@@ -215,7 +215,7 @@ contract P2PLending {
         Loan storage loan = loans[index];
         if (loan.openLoan == true) return true; else return false;
     }
-    function getApplicationData(uint index) public returns (uint[] memory, string memory, address){
+    function getApplicationData(uint index) public view returns (uint[] memory, string memory, address){
         string storage otherData = applications[index].otherData;
         uint[] memory numericalData = new uint[](4);
         numericalData[0] = index;
@@ -227,7 +227,7 @@ contract P2PLending {
         return (numericalData, otherData, borrower);
         // numericalData format = [index, duration, amount, interestrate]
     }
-    function getLoanData(uint index) public returns (uint[] memory, address, address){
+    function getLoanData(uint index) public view returns (uint[] memory, address, address){
         uint[] memory numericalData = new uint[](9);
         numericalData[0] = index;
         numericalData[1] = loans[index].interest_rate;
@@ -242,9 +242,9 @@ contract P2PLending {
         return (numericalData, loans[index].borrower, loans[index].investor);
         // numericalData format = [index, interestrate, duration, p_amnt, o_amnt, paid_amnt, starttime, app_index]
     }
-    function getNumApplications() public returns  (uint) { return numApplications;}
-    function getNumLoans() public returns (uint) { return numLoans;}
-    function isInvestor(address account) public returns (bool) {return investors[account].EXISTS;}
-    function isBorrower(address account) public returns (bool) {return borrowers[account].EXISTS;}
-    function getTime() public returns (uint){return block.timestamp;}
+    function getNumApplications() public view returns  (uint) { return numApplications;}
+    function getNumLoans() public view returns (uint) { return numLoans;}
+    function isInvestor(address account) public view returns (bool) {return investors[account].EXISTS;}
+    function isBorrower(address account) public view returns (bool) {return borrowers[account].EXISTS;}
+    function getTime() public  view returns (uint){return block.timestamp;}
 }
