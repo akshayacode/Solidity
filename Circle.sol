@@ -2,7 +2,7 @@ pragma solidity ^0.7.0;
 
 contract Circles{
     
-        struct FriendsCircle {
+    struct FriendsCircle {
         string name;
         address waddress;
         int balance;
@@ -12,6 +12,20 @@ contract Circles{
         string name;
         bool EXISTS;
     }
+
+    struct LoanApplication {
+        bool openApp;
+        uint applicationId;
+        
+        string title;
+        uint duration;// In months
+        uint interest_rate;
+        uint amount;// Loan amount
+        address borrower; 
+        address[] payees; 
+        //mapping(address => bool) agreements; 
+    }
+     //Loan[] public loans;
   
     /// This declares a state variable that stores a `FriendsCircle` struct for each possible address.
     mapping(address => FriendsCircle) public circle;
@@ -22,8 +36,8 @@ contract Circles{
     uint numApplications;
     uint numLoans;
 
-    // mapping (uint => LoanApplication) public applications;
-    //mapping (uint => Loan) public loans;
+    mapping (uint => LoanApplication) public applications;
+    // mapping (uint => Loan) public loans;
 
     mapping(address => bool) hasOngoingLoan;
     mapping(address => bool) hasOngoingApplication;
@@ -72,6 +86,34 @@ contract Circles{
         balances[msg.sender] -= amount;
         balances[taker] += amount;
     }
+    
+
+    
+    function initiateLoan(string memory _title, uint duration,uint interest_rate,uint _amount, address[] memory _payees) public {
+        require(_amount > 0);
+        require(_payees.length > 0 && _payees.length <= 20);
+        require(msg.sender == borrowers[msg.sender].borrower_public_key);
+        require(isloancircle(_payees));
+
+        applications[numApplications]= LoanApplication(true,numApplications,_title,duration,interest_rate ,_amount, msg.sender, _payees);
+        // loans.push(loan);
+        numApplications += 1;
+        hasOngoingApplication[msg.sender] = true;
+    }
+    
+    function isloancircle(address[] memory list) public view returns (bool) {
+        for (uint i = 0; i < list.length; i++) {
+            if (!isFriendCircle(list[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    function getNumApplications() public view returns  (uint) { return numApplications;}
+    function getNumLoans() public view returns (uint) { return numLoans;}
+    function isBorrower(address account) public view returns (bool) {return borrowers[account].EXISTS;}
+    function getTime() public  view returns (uint){return block.timestamp;}
     
         
         
