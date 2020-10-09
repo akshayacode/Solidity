@@ -25,6 +25,24 @@ contract Circles{
         address[] payees; 
         // mapping(address => bool) agreements; 
     }
+     struct Loan{
+
+        //For traversal and indexing
+        bool openLoan;
+        uint loanId;
+
+        address borrower;
+        address investor;
+        uint interest_rate;
+        uint duration;
+        uint principal_amount;
+        uint original_amount;
+        uint amount_paid;
+        uint startTime;
+        uint monthlyCheckpoint;
+        uint appId;
+
+    }
      //Loan[] public loans;
   
     /// This declares a state variable that stores a `FriendsCircle` struct for each possible address.
@@ -38,7 +56,7 @@ contract Circles{
     
     mapping(address => bool) agreements;
     mapping (uint => LoanApplication) public applications;
-    // mapping (uint => Loan) public loans;
+    mapping (uint => Loan) public loans;
 
     mapping(address => bool) hasOngoingLoan;
     mapping(address => bool) hasOngoingApplication;
@@ -110,11 +128,31 @@ contract Circles{
         }
         return true;
     }
-    function setAgreement(address _waddress) public returns (bool) {
+    function setAgreement() public returns (bool) {
   
-        agreements[ _waddress] =  true ;
+        agreements[msg.sender] =  true ;
         return true;
       
+    }
+    function grantLoan(uint appId) public {
+        //Check sufficient balance
+        require(balances[msg.sender] >= applications[appId].amount);
+        require(hasOngoingInvestment[msg.sender] == false);
+
+        // Take from sender and give to reciever
+        balances[msg.sender] -= applications[appId].amount;
+        balances[applications[appId].borrower] += applications[appId].amount;
+
+        
+        loans[numLoans] = Loan(true, numLoans, applications[appId].borrower, msg.sender, applications[appId].interest_rate, applications[appId].duration,
+        applications[appId].amount, applications[appId].amount, 0, block.timestamp,0, appId);
+        numLoans += 1;
+
+        applications[appId].openApp = false;
+        hasOngoingLoan[applications[appId].borrower] = true;
+        hasOngoingInvestment[msg.sender] = true;
+
+
     }
     
     
