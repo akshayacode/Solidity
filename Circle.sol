@@ -23,7 +23,7 @@ contract Circles{
         uint amount;// Loan amount
         address borrower; 
         address[] payees; 
-        //mapping(address => bool) agreements; 
+        // mapping(address => bool) agreements; 
     }
      //Loan[] public loans;
   
@@ -35,7 +35,8 @@ contract Circles{
     
     uint numApplications;
     uint numLoans;
-
+    
+    mapping(address => bool) agreements;
     mapping (uint => LoanApplication) public applications;
     // mapping (uint => Loan) public loans;
 
@@ -94,7 +95,7 @@ contract Circles{
         require(_payees.length > 0 && _payees.length <= 20);
         require(msg.sender == borrowers[msg.sender].borrower_public_key);
         require(isloancircle(_payees));
-
+        
         applications[numApplications]= LoanApplication(true,numApplications,_title,duration,interest_rate ,_amount, msg.sender, _payees);
         // loans.push(loan);
         numApplications += 1;
@@ -109,6 +110,13 @@ contract Circles{
         }
         return true;
     }
+    function setAgreement(address _waddress) public returns (bool) {
+  
+        agreements[ _waddress] =  true ;
+        return true;
+      
+    }
+    
     
     function getNumApplications() public view returns  (uint) { return numApplications;}
     function getNumLoans() public view returns (uint) { return numLoans;}
