@@ -11,6 +11,7 @@ contract Save{
     uint installmentAmount;
     uint noOfInstallments;
     uint noOfparticipants;
+    address manager;
  
     
     mapping(address => bool) public participants;
@@ -55,7 +56,7 @@ contract Save{
         installmentAmount = _installmentAmount;
         noOfInstallments = _noOfInstallments;
         noOfparticipants = _noOfparticipants;
-        
+        manager = msg.sender;
         LowestBid = _targetamount;
    
         
@@ -105,9 +106,13 @@ contract Save{
     function releaseFund() public  {
         require(currentNoOfContributors == noOfparticipants);
         require(status);
-
-       balances[LowestBidder] += LowestBid;
-
+        if(currentInstallment == 1)
+        {
+            balances[manager] += targetamount;
+        }
+        else{
+        balances[LowestBidder] += LowestBid;
+        }
         currentInstallment ++;
         fundBalance = LowestBid - targetamount;
         currentNoOfContributors = 0;
