@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.7.0;
 
 
-contract Savings{
+contract Save{
     mapping (address => uint) balances;
     
 
@@ -24,6 +23,11 @@ contract Savings{
     uint public currentInstallment = 1;
     uint public currentNoOfContributors;
     uint public fundBalance;
+    
+    //For bidding
+    uint  public LowestBid;
+    address public LowestBidder;
+    event LowestBidDecreased(address bidder, uint amount);
     
     function viewBalance() public view returns (uint256){
         return balances[msg.sender];
@@ -49,6 +53,8 @@ contract Savings{
         installmentAmount = _installmentAmount;
         noOfInstallments = _noOfInstallments;
         noOfparticipants = _noOfparticipants;
+        
+        LowestBid = _targetamount;
    
         
     }
@@ -78,6 +84,21 @@ contract Savings{
         contributedParticipants[msg.sender] = currentInstallment;
     }
     
+    function participantsToBePaidLength() public view returns(uint) {
+        return participantsToBePaid.length;
+    }
+    function bid(uint amount) public payable {
+  
+        require(
+            amount < LowestBid,
+            "There already is a Lowest bid."
+        );
+
+        
+        LowestBidder = msg.sender;
+        LowestBid = amount;
+        emit LowestBidDecreased(msg.sender, amount);
+    }
     
     
     
