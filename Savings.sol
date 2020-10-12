@@ -29,6 +29,8 @@ contract Save{
     address public LowestBidder;
     event LowestBidDecreased(address bidder, uint amount);
     
+   
+    
     function viewBalance() public view returns (uint256){
         return balances[msg.sender];
     }
@@ -100,9 +102,20 @@ contract Save{
         emit LowestBidDecreased(msg.sender, amount);
     }
     
-    
-    
-    
-    
+    function releaseFund() public  {
+        require(currentNoOfContributors == noOfparticipants);
+        require(status);
+
+       balances[LowestBidder] += LowestBid;
+
+        currentInstallment ++;
+        fundBalance = LowestBid - targetamount;
+        currentNoOfContributors = 0;
+
+        if(currentInstallment == noOfInstallments) {
+            status = false;
+        }
+    }
+
     
 }
