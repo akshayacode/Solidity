@@ -30,6 +30,9 @@ contract Save{
     address public LowestBidder;
     event LowestBidDecreased(address bidder, uint amount);
     
+    //Locker
+    uint public locker = 0;
+    
    
     
     function viewBalance() public view returns (uint256){
@@ -114,8 +117,10 @@ contract Save{
         balances[LowestBidder] += LowestBid;
         }
         currentInstallment ++;
-        fundBalance = LowestBid - targetamount;
+        fundBalance = targetamount - LowestBid;
+        locker += fundBalance;
         currentNoOfContributors = 0;
+        LowestBid = targetamount;
 
         if(currentInstallment == noOfInstallments) {
             status = false;
