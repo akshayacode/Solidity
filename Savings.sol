@@ -79,6 +79,10 @@ contract Save{
         require(participants[msg.sender] == true);
         _;
     }
+    modifier isManager() {
+        require(msg.sender == manager);
+        _;
+    }
     
     function contribute(uint amount) public isParticipant payable {
         require(amount == installmentAmount);
@@ -106,7 +110,7 @@ contract Save{
         emit LowestBidDecreased(msg.sender, amount);
     }
     
-    function releaseFund() public  {
+    function releaseFund() public isManager {
         require(currentNoOfContributors == noOfparticipants);
         require(status);
         if(currentInstallment == 1)
