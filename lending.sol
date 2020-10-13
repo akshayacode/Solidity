@@ -12,6 +12,7 @@ contract P2PLending {
     //Global counters, always increment
     uint numApplications;
     uint numLoans;
+    uint locker;
 
     mapping (uint => LoanApplication) public applications;
     mapping (uint => Loan) public loans;
@@ -61,8 +62,31 @@ contract P2PLending {
         uint appId;
 
     }
-    // Methods 
+     struct FriendsCircle {
+        string name;
+        address waddress;
+        int balance;
+    }
   
+    /// This declares a state variable that stores a `FriendsCircle` struct for each possible address.
+    mapping(address => FriendsCircle) public circle;
+    // Methods 
+    
+    function createFriendsCircle(string memory _name, address _waddress) public {
+        
+        require(_waddress != circle[_waddress].waddress); //only one address per person
+        FriendsCircle memory friendscircle = FriendsCircle({name: _name, waddress: _waddress, balance: 0});
+        circle[_waddress] = friendscircle;
+    }
+    
+   
+    function isFriendCircle(address _waddress) public view returns (bool) {
+        if (_waddress == circle[_waddress].waddress) {
+            return true;
+        }else {
+            return false;
+        }
+    }
     function createInvestor(string memory name) public {
         Investor memory investor;
         investor.name = name;
@@ -128,7 +152,14 @@ contract P2PLending {
 
         // Take from sender and give to reciever
         balances[msg.sender] -= applications[appId].credit_amount;
-        balances[applications[appId].borrower] += applications[appId].credit_amount;
+        locker +=  applications[appId].credit_amount;
+        
+        hasOngoingInvestment[msg.sender] = true;
+
+
+    }
+    function releaseLoan(uint appId) public {
+        balances[applications[appId].borrower] += applications[appId].credit_amount * 40/100;
 
         // Populate loan object
         loans[numLoans] = Loan(true, numLoans, applications[appId].borrower, msg.sender, applications[appId].interest_rate, applications[appId].duration,
@@ -137,9 +168,6 @@ contract P2PLending {
 
         applications[appId].openApp = false;
         hasOngoingLoan[applications[appId].borrower] = true;
-        hasOngoingInvestment[msg.sender] = true;
-
-
     }
     function repayLoan(uint amount, uint estimatedInterest, uint timeSinceLastPayment) public {
         //First check if the payer has enough money
@@ -211,7 +239,7 @@ contract P2PLending {
         LoanApplication storage app = applications[index];
         if(app.openApp) return true; else return false;
     }
-    function ifLoanOpen(uint index) public returns (bool){
+    function ifLoanOpen(uint index) public view returns (bool){
         Loan storage loan = loans[index];
         if (loan.openLoan == true) return true; else return false;
     }
