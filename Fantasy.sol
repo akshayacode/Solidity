@@ -9,7 +9,7 @@ contract Fantasy {
         uint team_size;
         uint prizeamount;
         uint spots;
-        
+        uint particiantsJoined;
         
     }
     uint numcontest;
@@ -38,8 +38,9 @@ contract Fantasy {
     
     
     
-     function createcontest(string memory name,uint entryfee,uint team_size,uint prizeamount,uint spots) public {
-        Contestdetails[numcontest] = contest(name,entryfee,team_size,prizeamount,spots);
+    function createcontest(string memory name,uint entryfee,uint team_size,uint prizeamount,uint spots) public {
+        Contestdetails[numcontest] = contest(name,entryfee,team_size,prizeamount,spots,0);
+        numcontest++;
     }
     
     function CreateTeam(string memory _name, string[] memory _players) public {
@@ -52,5 +53,12 @@ contract Fantasy {
     }
     function getPlayersname(uint256 _index) public view returns (string[] memory) {
         return teamData[_index].playername;
+    }
+    function joincontest(uint _index) public payable {
+        require(Contestdetails[_index].spots > Contestdetails[_index].particiantsJoined,'Contest Limit exceeded');
+        
+            Contestdetails[_index].particiantsJoined += 1;
+           
+        
     }
 }
