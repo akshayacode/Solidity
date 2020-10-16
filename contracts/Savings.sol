@@ -69,12 +69,14 @@ contract Save{
         _;
     }
     
-    function contribute(uint amount) public isParticipant payable {
+    function contribute(address addr,uint amount) public isParticipant payable {
         require(amount == installmentAmount);
         require(contributedParticipants[msg.sender] != currentInstallment);
         require(status);
 
         fundBalance += amount;
+        Accounts ac = Accounts(addr);
+        ac.withdraw(msg.sender,amount);
         currentNoOfContributors ++;
         contributedParticipants[msg.sender] = currentInstallment;
     }
