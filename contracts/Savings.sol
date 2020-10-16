@@ -4,8 +4,8 @@ pragma solidity ^0.7.0;
 import './Accounts.sol';
 contract Save{
    
-    Accounts acc = new Accounts();
-    mapping (address => uint) balance;
+    
+    // mapping (address => uint) balance;
     
 
     string FundName;
@@ -95,8 +95,9 @@ contract Save{
         emit LowestBidDecreased(msg.sender, amount);
     }
     
-    function releaseFund() public payable isManager {
-        //require(currentNoOfContributors == noOfparticipants);
+    function releaseFund(address _addr) public payable isManager {
+        Accounts acc = Accounts(_addr);
+        require(currentNoOfContributors == noOfparticipants);
         require(status);
         if(currentInstallment == 1)
         {
