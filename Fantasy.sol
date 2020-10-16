@@ -3,6 +3,7 @@ pragma experimental ABIEncoderV2;
 
 contract Fantasy {
     
+    mapping(address => uint) balances;
     struct contest{
         string name;
         uint entryfee;
@@ -35,11 +36,12 @@ contract Fantasy {
     
     mapping(uint => Player) public playerdetails;
     uint players;
-    
+    address[] creator;
     
     
     function createcontest(string memory name,uint entryfee,uint team_size,uint prizeamount,uint spots) public {
         Contestdetails[numcontest] = contest(name,entryfee,team_size,prizeamount,spots,0);
+        creator.push(msg.sender);
         numcontest++;
     }
     
@@ -54,10 +56,17 @@ contract Fantasy {
     function getPlayersname(uint256 _index) public view returns (string[] memory) {
         return teamData[_index].playername;
     }
+    function viewBalance() public view returns (uint256){
+        return balances[msg.sender];
+    }
+    function deposit(uint amount) public payable {
+        balances[msg.sender] += amount;
+    }
     function joincontest(uint _index) public payable {
         require(Contestdetails[_index].spots > Contestdetails[_index].particiantsJoined,'Contest Limit exceeded');
-        
-            Contestdetails[_index].particiantsJoined += 1;
+        balances[msg.sender] -= Contestdetails[_index].entryfee;
+        balances[creator[_index]] += Contestdetails[_index].entryfee;
+        Contestdetails[_index].particiantsJoined += 1;
            
         
     }
