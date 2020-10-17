@@ -2,6 +2,7 @@
 pragma solidity ^0.7.0;
 
 import './Accounts.sol';
+import './Borrower.sol';
 contract InvestorContract {
    
     
@@ -37,6 +38,13 @@ contract InvestorContract {
        // balances[msg.sender] = 0; // Init balance
 
     }
+    
+    function viewApplication(address _Caddr,uint index) public view  returns(uint[] memory, string memory, address) {
+        BorrowerContract bwr = BorrowerContract(_Caddr);
+        bwr.getApplicationData(index);
+    }
+    
+ 
 
     function DepositFD(address contractaddr,uint amount,address _addr) public payable {
         //Check sufficient balance
