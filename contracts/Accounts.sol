@@ -6,8 +6,8 @@ contract Accounts{
     
     mapping (address => uint) public balances;
     
-    function viewBalance() public view returns (uint256){
-        return balances[msg.sender];
+    function viewBalance(address addr) public view returns (uint256){
+        return balances[addr];
     }
     function deposit(uint amount) public payable {
         balances[msg.sender] += amount;
@@ -17,9 +17,9 @@ contract Accounts{
         balances[addr] -= amount;
         // return amount;
     }
-    function transfer(address taker, uint amount) public payable{
-        // require(balances[msg.sender] >= amount);
-        balances[msg.sender] -= amount;
+    function transfer(address giver,address taker, uint amount) public payable{
+        require(balances[giver] >= amount);
+        balances[giver] -= amount;
         balances[taker] += amount;
     }
 }
