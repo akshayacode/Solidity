@@ -14,7 +14,7 @@ contract Save{
     uint noOfInstallments;
     uint noOfparticipants;
     address manager;
- 
+    address locker = 0xdD870fA1b7C4700F2BD7f44238821C26f7392148;
     
     mapping(address => bool) public participants;
     uint public noOfParticipantsJoined;
@@ -33,7 +33,7 @@ contract Save{
     event LowestBidDecreased(address bidder, uint amount);
     
     //Locker
-    uint public locker = 0;
+  
     
  
      
@@ -76,7 +76,7 @@ contract Save{
 
         fundBalance += amount;
         Accounts ac = Accounts(addr);
-        ac.withdraw(msg.sender,amount);
+        ac.transfer(msg.sender,locker,amount);
         currentNoOfContributors ++;
         contributedParticipants[msg.sender] = currentInstallment;
     }
@@ -104,15 +104,14 @@ contract Save{
         if(currentInstallment == 1)
         {
             //balance[manager] += targetamount;
-            acc.transfer(manager,targetamount);
+            acc.transfer(locker,manager,targetamount);
         }
         else{
         //balance[LowestBidder] += LowestBid;
-        acc.transfer(LowestBidder,LowestBid);
+        acc.transfer(locker,LowestBidder,LowestBid);
         }
         currentInstallment ++;
         fundBalance = targetamount - LowestBid;
-        locker += fundBalance;
         currentNoOfContributors = 0;
         LowestBid = targetamount;
 
