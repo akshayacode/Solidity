@@ -12,10 +12,10 @@ contract Accounts{
     function deposit(uint amount) public payable {
         balances[msg.sender] += amount;
     }
-    function withdraw(uint amount) public payable returns(uint) {
-        require(amount <= balances[msg.sender]);
-        balances[msg.sender] -= amount;
-        return amount;
+    function withdraw(address addr,uint amount) public payable {
+        require(amount <= balances[addr]);
+        balances[addr] -= amount;
+        // return amount;
     }
     function transfer(address taker, uint amount) public payable{
         // require(balances[msg.sender] >= amount);
