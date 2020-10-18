@@ -1,18 +1,20 @@
 //SPDX-License-Identifier: MIT;
 pragma solidity ^0.7.0;
 
-import './Accounts.sol';
-import './Borrower.sol';
+import "./Accounts.sol";
+import "./Borrower.sol";
 contract InvestorContract {
-   
-    
+ 
+
     mapping (address => Investor) public investors;
 
-   
-   
-    address locker = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
+ 
+    address locker = 0xdD870fA1b7C4700F2BD7f44238821C26f7392148;
 
-    
+    function set(address contractaddr, address text1) public  view returns(address, string memory , bool) {
+      return  BorrowerContract(contractaddr).borrowers(text1);
+          
+    }
    
 
     mapping(address => bool) hasOngoingInvestment;
@@ -44,6 +46,12 @@ contract InvestorContract {
         bwr.getApplicationData(index);
     }
     
+    function demo(address addr,uint256 index) public view returns(bool) {
+        //BorrowerContract bwr = BorrowerContract(addr);
+        //bwr.ifApplicationOpen(index);
+        BorrowerContract(addr).ifApplicationOpen(index);
+    
+    }
  
 
     function DepositFD(address contractaddr,uint amount,address _addr) public payable {
