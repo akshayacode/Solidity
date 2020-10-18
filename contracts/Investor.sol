@@ -9,14 +9,15 @@ contract InvestorContract {
     mapping (address => Investor) public investors;
 
  
-    address locker = 0xdD870fA1b7C4700F2BD7f44238821C26f7392148;
+     address locker = 0xdD870fA1b7C4700F2BD7f44238821C26f7392148;
 
     function set(address contractaddr, address text1) public  view returns(address, string memory , bool) {
       return  BorrowerContract(contractaddr).borrowers(text1);
+       
           
     }
-   
-
+    
+  
     mapping(address => bool) hasOngoingInvestment;
 
     // Structs
@@ -41,17 +42,21 @@ contract InvestorContract {
 
     }
     
-    function viewApplication(address _Caddr,uint index) public view  returns(uint[] memory, string memory, address) {
-        BorrowerContract bwr = BorrowerContract(_Caddr);
-        bwr.getApplicationData(index);
-    }
-    
-    function demo(address addr,uint256 index) public view returns(bool) {
+      function demo(address addr,uint256 index) public view returns(bool) {
         //BorrowerContract bwr = BorrowerContract(addr);
         //bwr.ifApplicationOpen(index);
-        BorrowerContract(addr).ifApplicationOpen(index);
-    
+         return BorrowerContract(addr).ifApplicationOpen(index);
+
     }
+
+
+    
+    function viewApplication(address _Caddr,uint index) public view  returns(uint[] memory, string memory, address) {
+        BorrowerContract bwr = BorrowerContract(_Caddr);
+       return bwr.getApplicationData(index);
+    }
+    
+
  
 
     function DepositFD(address contractaddr,uint amount,address _addr) public payable {
