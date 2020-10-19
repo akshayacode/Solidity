@@ -1,15 +1,13 @@
 //SPDX-License-Identifier: MIT;
 pragma solidity ^0.7.0;
 
-import './Investor.sol';
-import './Accounts.sol';
+
 
 contract BorrowerContract {
    
    
     mapping (address => Borrower) public borrowers; // Borrower public key => Borrower
-    InvestorContract inv = new InvestorContract();
-    Accounts acc = new Accounts();
+    
 
     //Global counters, always increment
     uint numApplications;
@@ -65,9 +63,9 @@ contract BorrowerContract {
         int balance;
     }
   
-    /// This declares a state variable that stores a `FriendsCircle` struct for each possible address.
+   
     mapping(address => FriendsCircle) public circle;
-    // Methods 
+
     
     function createFriendsCircle(string memory _name, address _waddress) public {
         
@@ -126,6 +124,11 @@ contract BorrowerContract {
         Loan storage loan = loans[index];
         if (loan.openLoan == true) return true; else return false;
     }
+    
+    function getcreditamount(uint index) public view returns(uint) 
+    {
+        return applications[index].credit_amount;
+    }
     function getApplicationData(uint index) public view returns (uint[] memory, string memory, address){
         string storage otherData = applications[index].otherData;
         uint[] memory numericalData = new uint[](4);
@@ -151,11 +154,10 @@ contract BorrowerContract {
         numericalData[8] = loans[index].appId;
 
         return (numericalData, loans[index].borrower, loans[index].investor);
-        // numericalData format = [index, interestrate, duration, p_amnt, o_amnt, paid_amnt, starttime, app_index]
+        
     }
     function getNumApplications() public view returns  (uint) { return numApplications;}
     function getNumLoans() public view returns (uint) { return numLoans;}
-    
     function isBorrower(address account) public view returns (bool) {return borrowers[account].EXISTS;}
     function getTime() public  view returns (uint){return block.timestamp;}
 }
