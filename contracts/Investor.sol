@@ -65,28 +65,14 @@ contract InvestorContract {
     }
     
 
-
-    // function DepositFD(address contractaddr,uint amount,address _addr) public payable {
-    //     //Check sufficient balance
-    //     Accounts acc = Accounts(contractaddr);
-    //     require(acc.viewBalance(_addr) >= amount);
-    //     require(hasOngoingInvestment[msg.sender] == false);
-
-    //     acc.transfer(_addr,locker,amount);
-        
-    //     hasOngoingInvestment[msg.sender] = true;
-
-    // }
     
     function grantloan(address contractaddr,address _Caddr,uint index) public payable {
         Accounts acc = Accounts(contractaddr);
         BorrowerContract bwr = BorrowerContract(_Caddr);
-        uint amount = bwr.applications[index].credit_amount;
+        uint amount = bwr.getcreditamount(index);
         require(acc.viewBalance(msg.sender) >= amount);
         require(hasOngoingInvestment[msg.sender] == false);
-
         acc.transfer(msg.sender,locker,amount);
-        
         hasOngoingInvestment[msg.sender] = true;
 
     }
