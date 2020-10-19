@@ -2,17 +2,18 @@
 pragma solidity ^0.7.0;
 
 
-
+import './Accounts.sol';
 contract BorrowerContract {
    
-   
+    Accounts acc = new Accounts();
+    address locker ;
     mapping (address => Borrower) public borrowers; // Borrower public key => Borrower
     
 
     //Global counters, always increment
     uint numApplications;
     uint numLoans;
-    uint locker;
+    //uint locker;
 
     mapping (uint => LoanApplication) public applications;
     mapping (uint => Loan) public loans;
@@ -155,6 +156,87 @@ contract BorrowerContract {
 
         return (numericalData, loans[index].borrower, loans[index].investor);
         
+    }
+        function releaseLoan(uint appId) public {
+        //balances[applications[appId].borrower] += applications[appId].credit_amount * 40/100;
+        uint initialamount = applications[appId].credit_amount * 40/100;
+        acc.transfer(locker,applications[appId].borrower,initialamount);
+
+        // Populate loan object
+        loans[numLoans] = Loan(true, numLoans, applications[appId].borrower, msg.sender, applications[appId].interest_rate, applications[appId].duration,
+        applications[appId].credit_amount, applications[appId].credit_amount, 0, block.timestamp,0, appId);
+        numLoans += 1;
+
+        applications[appId].openApp = false;
+        hasOngoingLoan[applications[appId].borrower] = true;
+    }
+    function repayLoan(uint amount, uint estimatedInterest, uint timeSinceLastPayment) public {
+        //First check if the payer has enough money
+        //require(balances[msg.sender] >= amount);
+
+        //Find the loan
+        uint id_ = 0;
+        for(uint i=1; i<=numLoans; i++)
+        {
+                if(loans[i].borrower == msg.sender)
+                {
+                    id_ = i;
+                    break;
+                }
+        }
+        Loan storage loan = loans[id_];
+        //Loan found
+
+        //Require that a loan is ongoing
+        require(loan.openLoan == true);
+
+        //Get some params fromt the loan
+        uint p = loan.principal_amount;
+        // uint r = loan.interest_rate;
+        // uint checkpoint = loan.monthlyCheckpoint;
+        // uint n = 12; //Number of times loan is compounded annually
+
+
+        uint amountWithInterest = estimatedInterest;
+
+        //Get just the interest for that month
+        uint interest = amountWithInterest - p;
+      // uint t = timeSinceLastPayment;
+
+        //Payable Amount should not exceed the amountWithInterest
+        require(amountWithInterest>=amount);
+
+        //Payable amount should be at least equal to monthly interest
+        require(amount>=interest);
+
+        // Update balance for interest first
+           // balances[msg.sender] -= interest;
+           // balances[loan.investor] += interest;
+        acc.transfer(msg.sender,loan.investor,interest);
+
+        amount -= interest;
+        loan.monthlyCheckpoint += timeSinceLastPayment;
+        loan.amount_paid += interest;
+
+        // Extra payment after interest is paid
+        if(amount>0)
+        {
+            loan.principal_amount -= amount;
+            loan.amount_paid += amount;
+
+            // balances[msg.sender] -= amount;
+            // balances[loan.investor] += amount;
+            acc.transfer(msg.sender,loan.investor,amount);
+        }
+
+        if(loan.principal_amount == 0)
+        {
+            loans[id_].openLoan = false;
+            hasOngoingLoan[msg.sender] = false;
+            hasOngoingApplication[msg.sender] = false;
+            hasOngoingApplication[loan.investor] = false;
+            hasOngoingLoan[loan.investor] = false;
+        }
     }
     function getNumApplications() public view returns  (uint) { return numApplications;}
     function getNumLoans() public view returns (uint) { return numLoans;}
