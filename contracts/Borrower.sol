@@ -62,6 +62,7 @@ contract BorrowerContract {
         string name;
         address waddress;
         int balance;
+        bool agree;
     }
   
    
@@ -71,7 +72,7 @@ contract BorrowerContract {
     function createFriendsCircle(string memory _name, address _waddress) public {
         
         require(_waddress != circle[_waddress].waddress); //only one address per person
-        FriendsCircle memory friendscircle = FriendsCircle({name: _name, waddress: _waddress, balance: 0});
+        FriendsCircle memory friendscircle = FriendsCircle({name: _name, waddress: _waddress, balance: 0,agree:false});
         circle[_waddress] = friendscircle;
     }
     
@@ -82,6 +83,11 @@ contract BorrowerContract {
         }else {
             return false;
         }
+    }
+    
+    function circleAgree() public {
+        circle[msg.sender].agree = true;
+        
     }
     
     function createBorrower(string memory name) public {
