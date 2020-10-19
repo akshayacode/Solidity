@@ -9,13 +9,20 @@ contract InvestorContract {
     mapping (address => Investor) public investors;
 
  
-     address locker = 0xdD870fA1b7C4700F2BD7f44238821C26f7392148;
-     address bower ;
+    address public BorrowerContractAddress;
+    address public AccountsContractAddress;
+    
 
-    function set(address contractaddr, address text1) public  view returns(address, string memory , bool) {
+    // function set(address contractaddr, address text1) public  view returns(address, string memory , bool) {
       
-      return  BorrowerContract(contractaddr).borrowers(text1);
+    //   return  BorrowerContract(contractaddr).borrowers(text1);
        
+          
+    // }
+    function setcontractaddr(address borrower, address account) public   {
+      BorrowerContractAddress = borrower;
+      AccountsContractAddress = account;
+   
           
     }
  
@@ -53,26 +60,27 @@ contract InvestorContract {
 
 
     
-    function viewApplication(address _Caddr,uint index) public view  returns(uint[] memory, string memory, address) {
-        BorrowerContract bwr = BorrowerContract(_Caddr);
+    function viewApplication(uint index) public view  returns(uint[] memory, string memory, address) {
+       BorrowerContract bwr = BorrowerContract(BorrowerContractAddress);
        return bwr.getApplicationData(index);
     }
     
 
-     function applicationdata(address _Caddr,uint index) public view  returns(bool, uint, address, uint, uint, uint, string memory) {
-        BorrowerContract bwr = BorrowerContract(_Caddr);
+     function applicationdata(uint index) public view  returns(bool, uint, address, uint, uint, uint, string memory) {
+        BorrowerContract bwr = BorrowerContract(BorrowerContractAddress);
        return bwr.applications(index);
     }
     
 
     
-    function grantloan(address contractaddr,address _Caddr,uint index) public payable {
-        Accounts acc = Accounts(contractaddr);
-        BorrowerContract bwr = BorrowerContract(_Caddr);
+    function grantloan(uint index) public payable {
+        Accounts acc = Accounts(AccountsContractAddress);
+        BorrowerContract bwr = BorrowerContract(BorrowerContractAddress);
         uint amount = bwr.getcreditamount(index);
         require(acc.viewBalance(msg.sender) >= amount);
         require(hasOngoingInvestment[msg.sender] == false);
-        acc.transfer(msg.sender,locker,amount);
+        //address circlelocker = acc.locker();
+        acc.transfer(msg.sender,acc.locker(),amount);
         hasOngoingInvestment[msg.sender] = true;
 
     }
