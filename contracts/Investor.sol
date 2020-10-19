@@ -10,14 +10,15 @@ contract InvestorContract {
 
  
      address locker = 0xdD870fA1b7C4700F2BD7f44238821C26f7392148;
+     address bower ;
 
     function set(address contractaddr, address text1) public  view returns(address, string memory , bool) {
+      
       return  BorrowerContract(contractaddr).borrowers(text1);
        
           
     }
-    
-  
+ 
     mapping(address => bool) hasOngoingInvestment;
 
     // Structs
@@ -26,6 +27,7 @@ contract InvestorContract {
         string name;
         bool EXISTS;
     }
+    
    
 
  
@@ -57,15 +59,33 @@ contract InvestorContract {
     }
     
 
- 
+     function applicationdata(address _Caddr,uint index) public view  returns(bool, uint, address, uint, uint, uint, string memory) {
+        BorrowerContract bwr = BorrowerContract(_Caddr);
+       return bwr.applications(index);
+    }
+    
 
-    function DepositFD(address contractaddr,uint amount,address _addr) public payable {
-        //Check sufficient balance
+
+    // function DepositFD(address contractaddr,uint amount,address _addr) public payable {
+    //     //Check sufficient balance
+    //     Accounts acc = Accounts(contractaddr);
+    //     require(acc.viewBalance(_addr) >= amount);
+    //     require(hasOngoingInvestment[msg.sender] == false);
+
+    //     acc.transfer(_addr,locker,amount);
+        
+    //     hasOngoingInvestment[msg.sender] = true;
+
+    // }
+    
+    function grantloan(address contractaddr,address _Caddr,uint index) public payable {
         Accounts acc = Accounts(contractaddr);
-        require(acc.viewBalance(_addr) >= amount);
+        BorrowerContract bwr = BorrowerContract(_Caddr);
+        uint amount = bwr.applications[index].credit_amount;
+        require(acc.viewBalance(msg.sender) >= amount);
         require(hasOngoingInvestment[msg.sender] == false);
 
-        acc.transfer(_addr,locker,amount);
+        acc.transfer(msg.sender,locker,amount);
         
         hasOngoingInvestment[msg.sender] = true;
 
