@@ -2,7 +2,6 @@
 pragma solidity ^0.7.0;
 
 import "./Accounts.sol";
-//import "./Borrower.sol";
 import './Circle.sol'; // import borrower. sol
 contract InvestorContract {
  
@@ -67,7 +66,7 @@ contract InvestorContract {
         //address circlelocker = acc.locker();
         acc.transfer(msg.sender,beneficiary,amount);
         hasOngoingInvestment[msg.sender] = true;
-        cbwr.changestatusApproved(index);
+        cbwr.changestatusApproved(addr,index);
     }
 
 }
