@@ -2,6 +2,12 @@
 pragma solidity ^0.7.0;
 
 import './Accounts.sol';
+   enum Status{
+        Created,
+        Progress,
+        Shortlisted,
+        Approved
+    }
 contract CirclesContract {
     
     address public AccountsContract;
@@ -22,12 +28,7 @@ contract CirclesContract {
     
     mapping(address => Borrower) public borrwers;
     
-    enum Status{
-        Created,
-        Progress,
-        Shortlisted,
-        Accepted
-    }
+ 
     struct LoanApplication {
         //uint id;
         uint duration;
@@ -102,13 +103,19 @@ contract CirclesContract {
         
     }
     
+    function changestatusApproved(uint id) public {
+        applications[id].status = Status.Approved;
+    }
+    function changestatusShortlisted(uint id) public {
+        applications[id].status = Status.Shortlisted;
+    }
     
     function ifAgreed(uint id) public {
         //code if 80 % of participants agreed for loan
         applications[id].status = Status.Progress;
     }
     
-    
+      
     
 
 }
