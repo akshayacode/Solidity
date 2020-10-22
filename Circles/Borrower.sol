@@ -12,6 +12,7 @@ contract CirclesContract {
         address locker;
         address[] participants;
         uint circleLimit;
+        
     }
     
     struct Borrower{
@@ -74,23 +75,40 @@ contract CirclesContract {
         applications[numapplications] = LoanApplication(duration,interest_rate,credit_amount,total_circle_limit,EMI,Status.Created);
     }
     
-    function viewApplication(uint id) public view returns(uint,uint,uint,uint,uint,Status)
+    function viewApplication(uint id) public view returns(uint,uint,uint,uint,uint)
     {
         return (applications[id].duration,
                 applications[id].interest_rate,
                 applications[id].credit_amount,
                 applications[id].total_circle_limit,
-                applications[id].EMI,
-                applications[id].status);
+                applications[id].EMI
+                //applications[id].status
+                );
         
         //return applications[id]; (not working)
     }
     
-    function agreeForLoan(uint id) public {
-        // code 
+    function getCreditAmount(uint id) public view returns(uint){
+        return applications[id].credit_amount;
     }
     
-    function ifAgreed() public {
+    function getlocker(address addr,uint id) public view returns (address) {
+        return borrwers[addr].circles[id].locker;
+    }
+    
+    function agreeForLoan(address addr,uint id) public {
+        // code 
+       
         
     }
+    
+    
+    function ifAgreed(uint id) public {
+        //code if 80 % of participants agreed for loan
+        applications[id].status = Status.Progress;
+    }
+    
+    
+    
+
 }
