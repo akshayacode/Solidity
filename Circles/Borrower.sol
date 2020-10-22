@@ -1,101 +1,47 @@
-//SPDX-License-Identifier: MIT;
+//SPDX-License-Identifier:MIT
 pragma solidity ^0.7.0;
 
-
 import './Accounts.sol';
-contract BorrowerContract {
+contract CirclesContract {
     
     address public AccountsContract;
-   
-    enum Status{
-        Created,
-        progress,
-        Shortlisted,
-        Approved
-    }
-    struct Borrower{
-        address borrower_public_key;
-        string[] circles;
-        address[] defaultAddress;
-    }
-    
-    mapping(address => Borrower) public BorrowerCircle;
-    
     struct Circle{
+        string name;
+        address manager;
         address locker;
-        address[] circleMembers;
+        address[] participants;
         uint circleLimit;
     }
     
-    mapping(uint => Circle) public circle;
-    
-    struct LoanApplication{
-        //For traversal and indexing
-        bool openApp;
-        uint applicationId;
-
-        //address borrower;
-        uint duration; // In months
-        uint credit_amount; // Loan amount
-        uint interest_rate; //From form
-        //string otherData;// Encoded string with delimiters (~)
-        uint circleLimit;
-        Status status;
-        //address[] borrowercircle;
-        //address defaultAddress;
-
-
+    struct Borrower{
+        address borrower;
+        mapping(uint => Circle) circles;
     }
     
-    mapping(address => bool) hasOngoingLoan;
-    mapping(address => bool) hasOngoingApplication;
-    mapping (uint => LoanApplication) public applications;
-    uint numApplications;
+    mapping(address => Borrower) public borrwers;
     
-    function setAccountContract(address Caddr) public {
-        AccountsContract = Caddr;
-    }
-    function createBorrower() public {
-        BorrowerCircle[msg.sender].borrower_public_key = msg.sender;
-    }
-    function createCircle(string memory name) public {
-        
-        BorrowerCircle[msg.sender].circles.push(name);
-        BorrowerCircle[msg.sender].defaultAddress.push(address(uint160(uint(keccak256(abi.encodePacked(block.timestamp))))));
-       
+    function setAccountsContract(address addr) public {
+        AccountsContract = addr;
     }
     
-    function getdefaultAddress(uint index) public view returns(address) {
-        return BorrowerCircle[msg.sender].defaultAddress[index];
-    }
-    
-    function initiatecircleLimit(uint index,uint circleLimit) public
-    {
-     //BorrowerCircle[msg.sender].circles[index]
-     address getter = BorrowerCircle[msg.sender].defaultAddress[index];
-     circle[index].locker = BorrowerCircle[msg.sender].defaultAddress[index];
-     circle[index].circleLimit = circleLimit;
-     Accounts acc = Accounts(AccountsContract);
-     acc.transfer(msg.sender,getter,circleLimit);
-    }
-    
-    function JoinCircle(uint index) public {
-        circle[index].circleMembers.push(msg.sender);
+    function createCircle(uint id,string memory name,uint circleLimit) public{
+        borrwers[msg.sender].borrower = msg.sender;
+        borrwers[msg.sender].circles[id].name= name;
+        borrwers[msg.sender].circles[id].circleLimit = circleLimit;
+        borrwers[msg.sender].circles[id].manager = msg.sender;
+        borrwers[msg.sender].circles[id].locker = address(uint160(uint(keccak256(abi.encodePacked(block.timestamp)))));
         Accounts acc = Accounts(AccountsContract);
-        acc.transfer(msg.sender,circle[index].locker,circle[index].circleLimit);
+        acc.transfer(msg.sender,borrwers[msg.sender].circles[id].locker ,circleLimit);
         
     }
     
-    function initiateApplication(uint duration,uint interest_rate,uint credit_amount,uint circleLimit,uint EMI) public {
-        applications[numApplications] = LoanApplication(true,duration,interest_rate,credit_amount,circleLimit,EMI,Status.Created);    
+    
+    function viewCircle(address addr,uint id) public view returns(string memory,address,address[] memory,uint) {
+        return(borrwers[addr].circles[id].name,borrwers[msg.sender].circles[id].manager,borrwers[msg.sender].circles[id].participants,borrwers[msg.sender].circles[id].circleLimit);
     }
     
-    // function viewInitailApp(uint index) public view returns (bool,uint,uint,uint,uint,Status){
-        
-    //     applications[index].circleLimit;
-    // }
-    
-    function agree(uint index) public  {
-       applications[index].status = Status.progress;
+    function joincircle(address addr,uint id) public {
+        borrwers[addr].circles[id].participants.push(msg.sender);
     }
+    
 }
