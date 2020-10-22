@@ -15,12 +15,6 @@ contract InvestorContract {
     
     address public contractaddr;
 
-    // function set(address contractaddr, address text1) public  view returns(address, string memory , bool) {
-      
-    //   return  BorrowerContract(contractaddr).borrowers(text1);
-       
-          
-    // }
     function setcontractaddr(address borrower, address account) public   {
       //BorrowerContractAddress = borrower;
       contractaddr = borrower;
@@ -57,7 +51,10 @@ contract InvestorContract {
         return cbwr.viewApplication(id);
     }
     
-
+    function Shortlist(uint id) public{
+        CirclesContract cbwr = CirclesContract(contractaddr);
+        cbwr.changestatusShortlisted(id);
+    }
     
     function grantloan(address addr,uint index) public payable {
         Accounts acc = Accounts(AccountsContractAddress);
@@ -70,8 +67,7 @@ contract InvestorContract {
         //address circlelocker = acc.locker();
         acc.transfer(msg.sender,beneficiary,amount);
         hasOngoingInvestment[msg.sender] = true;
-        //cbwr.applications(index).credit_amount= Status.Shortlisted;
-
+        cbwr.changestatusApproved(index);
     }
 
 }
