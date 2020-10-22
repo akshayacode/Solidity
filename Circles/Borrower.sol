@@ -18,6 +18,7 @@ contract CirclesContract {
         address locker;
         address[] participants;
         uint circleLimit;
+        address investor;
         
     }
     
@@ -42,6 +43,7 @@ contract CirclesContract {
     }
     mapping(uint => LoanApplication) public applications;
     uint numapplications;
+    
     function setAccountsContract(address addr) public {
         AccountsContract = addr;
     }
@@ -103,8 +105,10 @@ contract CirclesContract {
         
     }
     
-    function changestatusApproved(uint id) public {
+    function changestatusApproved(address addr,uint id) public {
         applications[id].status = Status.Approved;
+        borrwers[addr].circles[id].investor = msg.sender;
+        
     }
     function changestatusShortlisted(uint id) public {
         applications[id].status = Status.Shortlisted;
@@ -112,10 +116,17 @@ contract CirclesContract {
     
     function ifAgreed(uint id) public {
         //code if 80 % of participants agreed for loan
+        //uint members = borrwers[addr].circles[id].participants.length;
+        
         applications[id].status = Status.Progress;
     }
     
-      
+    function PaytoInvestor(address addr,uint id,uint EMI) public payable {
+        address payer = borrwers[addr].circles[id].locker;
+        Accounts acc = Accounts(AccountsContract);
+        acc.transfer(payer,borrwers[addr].circles[id].investor,EMI);
+    }
+     
     
 
 }
