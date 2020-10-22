@@ -44,6 +44,27 @@ contract CirclesContract {
     mapping(uint => LoanApplication) public applications;
     uint numapplications;
     
+    mapping(address => bool) hasOngoingLoan;
+    mapping(address => bool) hasOngoingApplication;
+    
+    struct Loan{
+        bool openLoan;
+        uint loanId;
+        address borrower;
+        address investor;
+        uint interest_rate;
+        uint duration;
+        uint principal_amount;
+        uint original_amount;
+        uint amount_paid;
+        uint startTime;
+        uint monthlyCheckpoint;
+        uint appId;
+
+    }
+    mapping(uint => Loan) public loans;
+    uint numLoans;
+    
     function setAccountsContract(address addr) public {
         AccountsContract = addr;
     }
@@ -74,7 +95,8 @@ contract CirclesContract {
         borrwers[addr].circles[id].participants.push(msg.sender);
     }
     
-    function CreateApplication(uint duration,uint interest_rate,uint credit_amount,uint total_circle_limit,uint EMI) public {
+    function CreateApplication(address addr,uint id,uint duration,uint interest_rate,uint credit_amount,uint total_circle_limit,uint EMI) public {
+        borrwers[addr].circles[id].borrower = msg.sender;
         applications[numapplications] = LoanApplication(duration,interest_rate,credit_amount,total_circle_limit,EMI,Status.Created);
     }
     
@@ -121,12 +143,30 @@ contract CirclesContract {
         applications[id].status = Status.Progress;
     }
     
+    function releaseLoan(address addr,uint id,uint appId) public {
+        Accounts acc = Accounts(AccountsContract);
+        //balances[applications[appId].borrower] += applications[appId].credit_amount * 40/100;
+        uint initialamount = applications[appId].credit_amount * 40/100;
+        acc.transfer(borrwers[addr].circles[id].locker,borrwers[addr].circles[id].borrower,initialamount);
+
+        // Populate loan object
+        loans[numLoans] = Loan(true, numLoans, borrwers[addr].circles[id].borrower, borrwers[addr].circles[id].investor, applications[appId].interest_rate, applications[appId].duration,
+        applications[appId].credit_amount, applications[appId].credit_amount, 0, block.timestamp,0, appId);
+        numLoans += 1;
+
+        //applications[appId].openApp = false;
+        hasOngoingLoan[borrwers[addr].circles[id].borrower] = true;
+    }
     function PaytoInvestor(address addr,uint id,uint EMI) public payable {
         address payer = borrwers[addr].circles[id].locker;
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(payer,borrwers[addr].circles[id].investor,EMI);
     }
-     
-    
+
+
+    function getinvestor(address addr,uint id) public view  returns (address)
+    {
+        return borrwers[addr].circles[id].investor;
+    }
 
 }
