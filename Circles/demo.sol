@@ -5,6 +5,13 @@ import './Accounts.sol';
 contract CirclesContract {
     
     address public AccountsContract;
+    
+    
+     struct Borrower{
+        address borrower;
+        mapping(uint => Circle) circles;
+    }
+    
     struct Circle{
         string name;
         address manager;
@@ -12,26 +19,19 @@ contract CirclesContract {
         address locker;
         address[] participants;
         uint circleLimit;
-      mapping (address => participantsteams) participantslist;
+        mapping (address => participantsteams) participantslist;
         
     }
-     mapping (address => participantsteams) public participantslist;
-     
-        
     
     struct participantsteams{
-        uint id;
         address participantsno;
         bool agree;
     }
     
-    
-    struct Borrower{
-        address borrower;
-        mapping(uint => Circle) circles;
-    }
-    
     mapping(address => Borrower) public borrwers;
+    mapping (address => participantsteams) public participantslist;
+    
+ 
     
     enum Status{
         Created,
@@ -39,6 +39,8 @@ contract CirclesContract {
         Shortlisted,
         Accepted
     }
+    
+    
     struct LoanApplication {
         //uint id;
         uint duration;
@@ -50,6 +52,7 @@ contract CirclesContract {
         Status status;
         
     }
+    
     mapping(uint => LoanApplication) public applications;
     uint numapplications;
     function setAccountsContract(address addr) public {
@@ -69,12 +72,11 @@ contract CirclesContract {
     }
     
     
-    function viewCircle(address addr,uint id) public view returns(string memory,address,address[] memory,uint, address) {
+    function viewCircle(address addr,uint id) public view returns(string memory,address,address[] memory,uint) {
         return(borrwers[addr].circles[id].name,
                borrwers[addr].circles[id].manager,
                borrwers[addr].circles[id].participants,
-               borrwers[addr].circles[id].circleLimit,
-               borrwers[addr].circles[id].participantslist[addr].participantsno);
+               borrwers[addr].circles[id].circleLimit);
     }
     
     function joincircle(address addr,uint id) public {
@@ -83,12 +85,20 @@ contract CirclesContract {
         acc.transfer(msg.sender,borrwers[addr].circles[id].locker,borrwers[addr].circles[id].circleLimit);
         borrwers[addr].circles[id].participants.push(msg.sender);
       
-         uint a = borrwers[addr].circles[id].participants.length;
-        borrwers[addr].circles[id].participantslist[msg.sender].id = a + 1;
+      
         borrwers[addr].circles[id].participantslist[msg.sender].participantsno = msg.sender;
         borrwers[addr].circles[id].participantslist[msg.sender].agree = false;
         
     }
+
+    function participantslistget(address addr, uint id) public view returns(address, bool){
+        
+        
+       return ( borrwers[addr].circles[id].participantslist[msg.sender].participantsno, 
+                borrwers[addr].circles[id].participantslist[msg.sender].agree);
+                
+            }
+    
     function getdata(address addr, uint id) public payable{
       
         
@@ -126,9 +136,9 @@ contract CirclesContract {
     }
     
     
-    function checkagree(address addr) public view returns(uint, address, bool){
+    function checkagree(address addr) public view returns(address, bool){
         
-       return (participantslist[addr].id, participantslist[addr].participantsno, participantslist[addr].agree);
+       return (participantslist[addr].participantsno, participantslist[addr].agree);
     
         
     }
