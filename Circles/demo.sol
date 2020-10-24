@@ -10,6 +10,7 @@ contract CirclesContract {
      struct Borrower{
         address borrower;
         mapping(uint => Circle) circles;
+        
     }
     
     struct Circle{
@@ -20,14 +21,18 @@ contract CirclesContract {
         address[] participants;
         uint circleLimit;
         mapping (address => participantsteams) participantslist;
+        mapping(uint => checklist1)  checkme;
+             
         
     }
     
     struct participantsteams{
         address participantsno;
         bool agree;
+     
+       
     }
-    
+   
     mapping(address => Borrower) public borrwers;
     mapping (address => participantsteams) public participantslist;
     
@@ -39,7 +44,13 @@ contract CirclesContract {
         Shortlisted,
         Accepted
     }
-    
+         //temp store only
+         struct checklist1 {
+                
+                address[] user;
+                bool[] agree;
+            }
+            
     
     struct LoanApplication {
         //uint id;
@@ -78,7 +89,11 @@ contract CirclesContract {
                borrwers[addr].circles[id].participants,
                borrwers[addr].circles[id].circleLimit);
     }
+
     
+    
+    
+  
     function joincircle(address addr,uint id) public {
         Accounts acc = Accounts(AccountsContract);
         
@@ -91,29 +106,46 @@ contract CirclesContract {
         
     }
 
-    function participantslistget(address addr, uint id) public view returns(address, bool){
+     
+    function checkAgreeIam(address addr, uint id) public view returns(address, bool){
         
         
        return ( borrwers[addr].circles[id].participantslist[msg.sender].participantsno, 
                 borrwers[addr].circles[id].participantslist[msg.sender].agree);
                 
             }
-    
-    function getdata(address addr, uint id) public payable{
-      
-        
-        for (uint m = 0; m <  borrwers[addr].circles[id].participants.length; m++) {
-             borrwers[msg.sender].circles[id].participants[m];
+          
+    //only access for admin or manager 
+       function checkAgreeList(address addr, uint id) public view returns(address[] memory, bool[] memory){
+              return( borrwers[addr].circles[id].checkme[id].user, 
+                      borrwers[addr].circles[id].checkme[id].agree);
+              
+          }  
              
-        }
+    function Admincheckagree(address addr, uint id) public {
+      
+        for (uint m = 0; m <  borrwers[addr].circles[id].participants.length; m++) {
+           
+           if(borrwers[addr].circles[id].participantslist[borrwers[addr].circles[id].participants[m]].agree == true){
+               
+            borrwers[addr].circles[id].checkme[id].user.push(borrwers[addr].circles[id].participants[m]);
+            
+            borrwers[addr].circles[id].checkme[id].agree.push(true);
 
+           }else{
+               
+           borrwers[addr].circles[id].checkme[id].user.push(borrwers[addr].circles[id].participants[m]);
+            
+             borrwers[addr].circles[id].checkme[id].agree.push(false);
+                       
+           }
+           
+        }
         
     }
     
-    function getcirclelength(address addr, uint id) public view returns(uint){
-        
-      return borrwers[addr].circles[id].participants.length;
-    }
+    
+   
     
     function CreateApplication(uint duration,uint interest_rate,uint credit_amount,uint total_circle_limit,uint EMI) public {
         applications[numapplications] = LoanApplication(duration,interest_rate,credit_amount,total_circle_limit,EMI,Status.Created);
