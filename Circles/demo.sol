@@ -138,7 +138,7 @@ contract CirclesContract {
     
     function checkagree(address addr) public view returns(address, bool){
         
-       return (participantslist[addr].participantsno, participantslist[addr].agree);
+       return (participantslist[addr].participantsno, participantslist[msg.sender].agree);
     
         
     }
