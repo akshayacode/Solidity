@@ -21,7 +21,8 @@ contract CirclesContract {
         uint circleLimit;
         uint countParticipant;
         address investor;
-        mapping(address => participants) partcipantList;
+        mapping(uint => participants) partcipantList;
+       
         
     }
     struct participants{
@@ -100,7 +101,7 @@ contract CirclesContract {
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(msg.sender,borrwers[addr].circles[id].locker,borrwers[addr].circles[id].circleLimit);
         //borrwers[addr].circles[id].participants.push(msg.sender);
-        borrwers[addr].circles[id].partcipantList[msg.sender].circleMember.push(msg.sender);
+        borrwers[addr].circles[id].partcipantList[id].circleMember.push(msg.sender);
         borrwers[addr].circles[id].countParticipant++;
     }
     
@@ -135,7 +136,7 @@ contract CirclesContract {
     }
     
     function agreeForLoan(address addr,uint id) public {
-       borrwers[addr].circles[id].partcipantList[msg.sender].agree.push(true);
+       borrwers[addr].circles[id].partcipantList[id].agree.push(true);
        
         
     }
@@ -149,14 +150,14 @@ contract CirclesContract {
         applications[id].status = Status.Shortlisted;
     }
     
-    function ifAgreed(address addr,uint id) public  {
+    function ifAgreed(address addr,uint id,uint index) public  {
         //code if 80 % of participants agreed for loan
         //uint members = borrwers[addr].circles[id].participants.length;
-        uint numofAgreed =  borrwers[addr].circles[id].partcipantList[msg.sender].agree.length;
+        uint numofAgreed =  borrwers[addr].circles[id].partcipantList[id].agree.length;
         uint maxagree = borrwers[addr].circles[id].countParticipant * 80/100;
         if(numofAgreed >= maxagree)
         {
-            applications[id].status = Status.Progress;
+            applications[index].status = Status.Progress;
         }
         
     }
