@@ -4,8 +4,6 @@ pragma solidity ^0.7.0;
 import './Accounts.sol';
 contract Save{
    
-    
-    // mapping (address => uint) balance;
     enum Status {
         Active,
         Inactive,
@@ -14,16 +12,19 @@ contract Save{
 
     string FundName;
     uint circleLimit;
+    uint changeCircleLimit;
     uint targetamount;
     uint installmentAmount;
     uint noOfInstallments;
     uint noOfparticipants;
     address manager;
-    //address locker = 0xdD870fA1b7C4700F2BD7f44238821C26f7392148;
+    
+    //circle status
+    Status CircleStatus;
     
     mapping(address => bool) public participants;
     uint public noOfParticipantsJoined;
-    bool public status = true;
+    //bool public status = true;
     address[] public participantsArray;
     address[] public participantsToBePaid;
     
@@ -64,7 +65,7 @@ contract Save{
     }
      
     function changeCircleLimt(uint _circleLimit)  public  {
-        circleLimit = _circleLimit;
+        changeCircleLimit = _circleLimit;
         // Notofication should go to manager
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(msg.sender,defaultAddress,circleLimit);
@@ -75,13 +76,24 @@ contract Save{
         agree[msg.sender] = true;
     }
     
+    function checkagree() public isManager {
+        uint numagree = participantsArray.length;
+        uint maxagree = participantsArray.length * 80/100;
+        if(numagree >= maxagree)
+        {
+          circleLimit = changeCircleLimit;
+          Accounts acc = Accounts(AccountsContract);
+          acc.transfer(msg.sender,defaultAddress,circleLimit);  
+        }
+    }
+    
     function viewSavingCircle() public view returns(uint _circleLimit,uint,uint,uint,uint,uint) {
         return (circleLimit,targetamount,installmentAmount,noOfInstallments,noOfparticipants,noOfParticipantsJoined);
     }
     function joinFund() public {
         require(noOfParticipantsJoined < noOfparticipants);
         require(participants[msg.sender] != true);
-        require(status);
+        require(CircleStatus == Status.Active);
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(msg.sender,defaultAddress,circleLimit);
         participants[msg.sender] = true;
@@ -101,7 +113,7 @@ contract Save{
     function contribute(uint amount) public isParticipant payable {
         require(amount == installmentAmount);
         require(contributedParticipants[msg.sender] != currentInstallment);
-        require(status);
+        require(CircleStatus == Status.Active);
 
         fundBalance += amount;
         Accounts ac = Accounts(AccountsContract);
@@ -134,7 +146,7 @@ contract Save{
     function releaseFund() public payable isManager {
         Accounts acc = Accounts(AccountsContract);
         require(currentNoOfContributors == noOfparticipants);
-        require(status);
+        require(CircleStatus == Status.Active);
         if(currentInstallment == 1)
         {
             //balance[manager] += targetamount;
@@ -150,7 +162,7 @@ contract Save{
         LowestBid = targetamount;
 
         if(currentInstallment == noOfInstallments) {
-            status = false;
+           CircleStatus = Status.Inactive;
         }
     }
     
