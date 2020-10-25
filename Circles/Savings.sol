@@ -48,7 +48,7 @@ contract Save{
          AccountsContract = addr;
     } 
  
-    function SavingCircle(string memory name,uint _circleLimit,uint _targetamount,uint _installmentAmount,uint _noOfInstallments,uint _noOfparticipants) public
+    function CreateSavingCircle(string memory name,uint _circleLimit,uint _targetamount,uint _installmentAmount,uint _noOfInstallments,uint _noOfparticipants) public
     {
         FundName = name;
         circleLimit = _circleLimit;
@@ -61,6 +61,10 @@ contract Save{
         LowestBid = _targetamount;
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(msg.sender,defaultAddress,circleLimit);
+        participants[msg.sender] = true;
+        participantsArray.push(msg.sender);
+        participantsToBePaid.push(msg.sender);
+        noOfParticipantsJoined++;
         
     }
      
