@@ -11,15 +11,21 @@ import './Accounts.sol';
 contract CirclesContract {
     
     address public AccountsContract;
+    
     struct Circle{
         string name;
         address manager;
         address borrower;
         address locker;
-        address[] participants;
+        //address[] participants;
         uint circleLimit;
         address investor;
+        mapping(address => participants) partcipantList;
         
+    }
+    struct participants{
+        address circleMember;
+        bool agree;
     }
     
     struct Borrower{
@@ -82,17 +88,18 @@ contract CirclesContract {
     }
     
     
-    function viewCircle(address addr,uint id) public view returns(string memory,address,address[] memory,uint) {
-        return(borrwers[addr].circles[id].name,
-               borrwers[msg.sender].circles[id].manager,
-               borrwers[msg.sender].circles[id].participants,
-               borrwers[msg.sender].circles[id].circleLimit);
-    }
+    // function viewCircle(address addr,uint id) public view returns(string memory,address,address[] memory,uint) {
+    //     return(borrwers[addr].circles[id].name,
+    //           borrwers[msg.sender].circles[id].manager,
+    //           borrwers[msg.sender].circles[id].partcipantList[],
+    //           borrwers[msg.sender].circles[id].circleLimit);
+    // }
     
     function joincircle(address addr,uint id) public {
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(msg.sender,borrwers[addr].circles[id].locker,borrwers[addr].circles[id].circleLimit);
-        borrwers[addr].circles[id].participants.push(msg.sender);
+        //borrwers[addr].circles[id].participants.push(msg.sender);
+        borrwers[addr].circles[id].partcipantList[msg.sender].circleMember = msg.sender;
     }
     
     function CreateApplication(address addr,uint id,uint duration,uint interest_rate,uint credit_amount,uint total_circle_limit,uint EMI) public {
@@ -126,7 +133,7 @@ contract CirclesContract {
     }
     
     function agreeForLoan(address addr,uint id) public {
-        // code 
+       borrwers[addr].circles[id].partcipantList[msg.sender].agree = true;
        
         
     }
