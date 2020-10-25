@@ -77,6 +77,7 @@ contract Save{
     }
     
     function checkagree() public isManager {
+        require(agree[manager] == true);
         uint numagree = participantsArray.length;
         uint maxagree = participantsArray.length * 80/100;
         if(numagree >= maxagree)
