@@ -113,6 +113,10 @@ contract CirclesContract {
         //return applications[id]; (not working)
     }
     
+    function changeCircleLimit(address addr,uint id,uint credit_Limit) public {
+        borrwers[addr].circles[id].circleLimit = credit_Limit;
+    }
+    
     function getCreditAmount(uint id) public view returns(uint){
         return applications[id].credit_amount;
     }
@@ -168,5 +172,7 @@ contract CirclesContract {
     {
         return borrwers[addr].circles[id].investor;
     }
+    
+    
 
 }
