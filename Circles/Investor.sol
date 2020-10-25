@@ -5,11 +5,8 @@ import "./Accounts.sol";
 import './Circle.sol'; // import borrower. sol
 contract InvestorContract {
  
-
     mapping (address => Investor) public investors;
 
- 
-    
     address public AccountsContractAddress;
     
     address public contractaddr;
@@ -19,7 +16,6 @@ contract InvestorContract {
       contractaddr = borrower;
       AccountsContractAddress = account;
    
-          
     }
  
     mapping(address => bool) hasOngoingInvestment;
@@ -29,32 +25,40 @@ contract InvestorContract {
         address investor_public_key;
         string name;
         bool EXISTS;
+        InvestorStatus status;
+        uint interestrate;
     }
-   
+    
+    enum InvestorStatus{
+        Shortlisted,
+        Debited
+    }
    
     function createInvestor(string memory name) public {
         Investor memory investor;
         investor.name = name;
         investor.investor_public_key = msg.sender;
         investor.EXISTS = true;
-        //require (borrowers[msg.sender].EXISTS != true);
         investors[msg.sender] = investor;
         hasOngoingInvestment[msg.sender] = false;
-       // balances[msg.sender] = 0; // Init balance
 
     }
   
 
-     function applicationdata(uint id) public view  returns(uint,uint,uint,uint,uint) {
+    function applicationdata(uint id) public view  returns(uint,uint,uint,uint,uint,uint) {
         CirclesContract cbwr = CirclesContract(contractaddr);
         return cbwr.viewApplication(id);
     }
     
-    function Shortlist(uint id) public{
+    function Shortlist(uint id,uint interest_rate) public{
         CirclesContract cbwr = CirclesContract(contractaddr);
+        //cbwr.applications[id].interest_rate = interest_rate;
+        investors[msg.sender].interestrate = interest_rate;
+        investors[msg.sender].status = InvestorStatus.Shortlisted;
         cbwr.changestatusShortlisted(id);
+        
     }
-    
+   
     function grantloan(address addr,uint index) public payable {
         Accounts acc = Accounts(AccountsContractAddress);
         //BorrowerContract bwr = BorrowerContract(BorrowerContractAddress);
@@ -67,6 +71,7 @@ contract InvestorContract {
         acc.transfer(msg.sender,beneficiary,amount);
         hasOngoingInvestment[msg.sender] = true;
         cbwr.changestatusApproved(addr,index);
+        investors[msg.sender].status = InvestorStatus.Debited;
     }
 
 }
