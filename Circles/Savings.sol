@@ -56,18 +56,17 @@ contract Save{
         acc.transfer(msg.sender,defaultAddress,circleLimit);
         
     }
-    // function CreateChitFund(uint _targetamount,uint _installmentAmount,uint _noOfInstallments,uint _noOfparticipants) public
-    // {
-       
-    //   targetamount = _targetamount;
-    //     installmentAmount = _installmentAmount;
-    //     noOfInstallments = _noOfInstallments;
-    //     noOfparticipants = _noOfparticipants;
-    //     LowestBid = _targetamount;
-   
-         
-    // }
+     
+    function changeCircleLimt(uint _circleLimit) public {
+        require(participants[msg.sender] == true);
+        circleLimit = _circleLimit;
+        Accounts acc = Accounts(AccountsContract);
+        acc.transfer(msg.sender,defaultAddress,circleLimit);
+    }
     
+    function viewSavingCircle() public view returns(uint _circleLimit,uint,uint,uint,uint,uint) {
+        return (circleLimit,targetamount,installmentAmount,noOfInstallments,noOfparticipants,noOfParticipantsJoined);
+    }
     function joinFund() public {
         require(noOfParticipantsJoined < noOfparticipants);
         require(participants[msg.sender] != true);
