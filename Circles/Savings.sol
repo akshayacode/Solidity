@@ -168,7 +168,11 @@ contract Save{
     
     function setAuctionTime() public isManager {
         AuctionTime = block.timestamp * 1 days;
+        
     }
 
-    
+    function Lockcircle() public {
+        require(LowestBid == targetamount);
+        CircleStatus = Status.Locked;
+    }
 }
