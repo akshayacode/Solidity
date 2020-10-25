@@ -89,12 +89,12 @@ contract CirclesContract {
     }
     
     
-    // function viewCircle(address addr,uint id) public view returns(string memory,address,address[] memory,uint) {
-    //     return(borrwers[addr].circles[id].name,
-    //           borrwers[msg.sender].circles[id].manager,
-    //           borrwers[msg.sender].circles[id].partcipantList[],
-    //           borrwers[msg.sender].circles[id].circleLimit);
-    // }
+    function viewCircle(address addr,uint id) public view returns(string memory,address,uint,uint) {
+        return(borrwers[addr].circles[id].name,
+              borrwers[addr].circles[id].manager,
+              borrwers[addr].circles[id].countParticipant,
+              borrwers[addr].circles[id].circleLimit);
+    }
     
     function joincircle(address addr,uint id) public {
         Accounts acc = Accounts(AccountsContract);
