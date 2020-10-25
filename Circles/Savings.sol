@@ -6,7 +6,11 @@ contract Save{
    
     
     // mapping (address => uint) balance;
-    
+    enum Status {
+        Active,
+        Inactive,
+        Locked
+    }
 
     string FundName;
     uint circleLimit;
@@ -24,11 +28,13 @@ contract Save{
     address[] public participantsToBePaid;
     
     mapping(address => uint) public contributedParticipants;
+    mapping(address => bool) public agree;
     uint public currentInstallment = 1;
     uint public currentNoOfContributors;
     uint public fundBalance;
     
     //For bidding
+    uint public AuctionTime;
     uint  public LowestBid;
     address public LowestBidder;
     event LowestBidDecreased(address bidder, uint amount);
@@ -57,11 +63,16 @@ contract Save{
         
     }
      
-    function changeCircleLimt(uint _circleLimit) public {
-        require(participants[msg.sender] == true);
+    function changeCircleLimt(uint _circleLimit)  public  {
         circleLimit = _circleLimit;
+        // Notofication should go to manager
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(msg.sender,defaultAddress,circleLimit);
+    }
+    
+    function Agree() public isParticipant {
+        
+        agree[msg.sender] = true;
     }
     
     function viewSavingCircle() public view returns(uint _circleLimit,uint,uint,uint,uint,uint) {
@@ -71,7 +82,8 @@ contract Save{
         require(noOfParticipantsJoined < noOfparticipants);
         require(participants[msg.sender] != true);
         require(status);
-
+        Accounts acc = Accounts(AccountsContract);
+        acc.transfer(msg.sender,defaultAddress,circleLimit);
         participants[msg.sender] = true;
         participantsArray.push(msg.sender);
         participantsToBePaid.push(msg.sender);
@@ -102,6 +114,11 @@ contract Save{
         return participantsToBePaid.length;
     }
     function bid(uint amount) public payable {
+        
+        require(
+            block.timestamp <= AuctionTime,
+            "Auction already ended."
+        );
   
         require(
             amount < LowestBid,
@@ -135,6 +152,10 @@ contract Save{
         if(currentInstallment == noOfInstallments) {
             status = false;
         }
+    }
+    
+    function setAuctionTime() public isManager {
+        AuctionTime = block.timestamp * 1 days;
     }
 
     
