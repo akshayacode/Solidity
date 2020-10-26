@@ -2,7 +2,7 @@
 pragma solidity ^0.7.0;
 
 import "./Accounts.sol";
-import './Circle.sol'; // import borrower. sol
+import './Borrower.sol'; // import borrower. sol
 contract InvestorContract {
  
     mapping (address => Investor) public investors;
@@ -45,7 +45,7 @@ contract InvestorContract {
     }
   
 
-    function applicationdata(uint id) public view  returns(uint,uint,uint,uint,uint,uint) {
+    function applicationdata(uint id) public view  returns(uint,uint,uint,uint,uint) {
         CirclesContract cbwr = CirclesContract(contractaddr);
         return cbwr.viewApplication(id);
     }
