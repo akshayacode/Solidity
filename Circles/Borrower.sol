@@ -49,6 +49,7 @@ contract CirclesContract {
         uint EMI;
         Status status;
         
+        
     }
     mapping(uint => LoanApplication) public applications;
     uint public  numapplications;
@@ -165,6 +166,12 @@ contract CirclesContract {
         
     }
     
+    function selectInvestor(address addr,uint id,address investor_address,uint appId) public {
+        borrwers[addr].circles[id].investor = investor_address;
+        applications[appId].status = Status.Shortlisted;
+    }
+   
+    
     function releaseLoan(address addr,uint id,uint appId) public {
         Accounts acc = Accounts(AccountsContract);
         //balances[applications[appId].borrower] += applications[appId].credit_amount * 40/100;
@@ -184,11 +191,14 @@ contract CirclesContract {
     }
     
     function payMonthlyEMI(address addr,uint id,uint EMI_amount) public payable {
+        //paying to locker
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(msg.sender,borrwers[addr].circles[id].locker,EMI_amount);
     }
 
     function PaytoInvestor(address addr,uint id,uint EMI) public payable {
+        
+        // locker to investor
         address payer = borrwers[addr].circles[id].locker;
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(payer,borrwers[addr].circles[id].investor,EMI);
