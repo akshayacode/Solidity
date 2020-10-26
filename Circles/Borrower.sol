@@ -19,6 +19,7 @@ contract CirclesContract {
         address borrower;
         address locker;
         uint circleLimit;
+        uint changeCircleLimit;
         uint countParticipant;
         address investor;
         mapping(uint => participants) partcipantList;
@@ -28,6 +29,7 @@ contract CirclesContract {
     struct participants{
         address[] circleMember;
         bool[] agree;
+        bool[] agreeForCircleLimit;
     }
     
     struct Borrower{
@@ -127,8 +129,23 @@ contract CirclesContract {
         //return applications[id]; (not working)
     }
     
-    function changeCircleLimit(address addr,uint id,uint credit_Limit) public {
-        borrwers[addr].circles[id].circleLimit = credit_Limit;
+    function initiateCircleLimit(address addr,uint id,uint credit_Limit) public {
+        borrwers[addr].circles[id].changeCircleLimit = credit_Limit;
+    }
+    
+    function agreeForCircleLimit(address addr,uint id) public 
+    {
+       borrwers[addr].circles[id].partcipantList[id].agreeForCircleLimit.push(true);
+    }
+    
+    function changeCircleLimit(address addr,uint id) public {
+        uint numparticipants =  borrwers[addr].circles[id].partcipantList[id].circleMember.length;  
+        uint maxagree = borrwers[addr].circles[id].partcipantList[id].circleMember.length * 80/100;
+        if( maxagree >= numparticipants)
+        {
+            borrwers[addr].circles[id].circleLimit = borrwers[addr].circles[id].changeCircleLimit;
+        }
+        
     }
     
     function getCreditAmount(uint id) public view returns(uint){
