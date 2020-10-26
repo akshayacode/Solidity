@@ -35,6 +35,7 @@ contract InvestorContract {
    
     function createInvestor(string memory name) public {
         //Investor memory investor;
+        require(investors[msg.sender].EXISTS != true);
         investors[msg.sender].name = name;
         investors[msg.sender].investor_public_key = msg.sender;
         investors[msg.sender].EXISTS = true;
@@ -60,6 +61,7 @@ contract InvestorContract {
     }
    
     function grantloan(address addr,uint index) public payable {
+        require(investors[msg.sender].EXISTS == true);
         Accounts acc = Accounts(AccountsContractAddress);
         CirclesContract cbwr = CirclesContract(contractaddr);
         uint amount = cbwr.getCreditAmount(index);
