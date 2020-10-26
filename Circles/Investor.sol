@@ -45,7 +45,7 @@ contract InvestorContract {
     }
   
 
-    function applicationdata(uint id) public view  returns(uint,uint,uint,uint,uint) {
+    function applicationdata(uint id) public view  returns(uint,uint,uint,uint,uint,uint) {
         CirclesContract cbwr = CirclesContract(contractaddr);
         return cbwr.viewApplication(id);
     }
