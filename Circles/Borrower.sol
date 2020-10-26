@@ -6,7 +6,8 @@ import './Accounts.sol';
         Created,
         Progress,
         Shortlisted,
-        Approved
+        Approved,
+        Disbursed
     }
 contract CirclesContract {
     
@@ -17,7 +18,6 @@ contract CirclesContract {
         address manager;
         address borrower;
         address locker;
-        //address[] participants;
         uint circleLimit;
         uint countParticipant;
         address investor;
@@ -41,7 +41,8 @@ contract CirclesContract {
     struct LoanApplication {
         //uint id;
         uint duration;
-        uint interest_rate;
+        uint start_interest_rate;
+        uint end_interest_rate;
         uint credit_amount;
         uint total_circle_limit;
         //uint available_limit;
@@ -105,15 +106,17 @@ contract CirclesContract {
         borrwers[addr].circles[id].countParticipant++;
     }
     
-    function CreateApplication(address addr,uint id,uint duration,uint interest_rate,uint credit_amount,uint total_circle_limit,uint EMI) public {
+    function CreateApplication(address addr,uint id,uint duration,uint start_interestrate,uint end_interestrate,uint credit_amount,uint total_circle_limit,uint EMI) public {
         borrwers[addr].circles[id].borrower = msg.sender;
-        applications[numapplications] = LoanApplication(duration,interest_rate,credit_amount,total_circle_limit,EMI,Status.Created);
+        applications[numapplications] = LoanApplication(duration,start_interestrate,end_interestrate,credit_amount,total_circle_limit,EMI,Status.Created);
+        numapplications++;
     }
     
-    function viewApplication(uint id) public view returns(uint,uint,uint,uint,uint)
+    function viewApplication(uint id) public view returns(uint,uint,uint,uint,uint,uint)
     {
         return (applications[id].duration,
-                applications[id].interest_rate,
+                applications[id].start_interest_rate,
+                applications[id].end_interest_rate,
                 applications[id].credit_amount,
                 applications[id].total_circle_limit,
                 applications[id].EMI
@@ -169,12 +172,13 @@ contract CirclesContract {
         acc.transfer(borrwers[addr].circles[id].locker,borrwers[addr].circles[id].borrower,initialamount);
 
         // Populate loan object
-        loans[numLoans] = Loan(true, numLoans, borrwers[addr].circles[id].borrower, borrwers[addr].circles[id].investor, applications[appId].interest_rate, applications[appId].duration,
+        loans[numLoans] = Loan(true, numLoans, borrwers[addr].circles[id].borrower, borrwers[addr].circles[id].investor, applications[appId].start_interest_rate, applications[appId].duration,
         applications[appId].credit_amount, applications[appId].credit_amount, 0, block.timestamp,0, appId);
         numLoans += 1;
 
         //applications[appId].openApp = false;
         hasOngoingLoan[borrwers[addr].circles[id].borrower] = true;
+        applications[appId].status = Status.Disbursed;
     }
     function PaytoInvestor(address addr,uint id,uint EMI) public payable {
         address payer = borrwers[addr].circles[id].locker;
