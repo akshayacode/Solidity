@@ -113,15 +113,15 @@ contract CirclesContract {
         numapplications++;
     }
     
-    function viewApplication(uint id) public view returns(uint,uint,uint,uint,uint,uint)
+    function viewApplication(uint id) public view returns(uint,uint,uint,uint,uint,uint,Status)
     {
         return (applications[id].duration,
                 applications[id].start_interest_rate,
                 applications[id].end_interest_rate,
                 applications[id].credit_amount,
                 applications[id].total_circle_limit,
-                applications[id].EMI
-                //applications[id].status
+                applications[id].EMI,
+                applications[id].status
                 );
         
         //return applications[id]; (not working)
