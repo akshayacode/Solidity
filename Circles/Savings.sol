@@ -39,10 +39,14 @@ contract Save{
     uint  public LowestBid;
     address public LowestBidder;
     event LowestBidDecreased(address bidder, uint amount);
-    address  public defaultAddress ;
-    address public AccountsContract;
     
     //Locker
+    address  public defaultAddress ;
+    
+    //Accounts contract address is stored
+    address public AccountsContract;
+    
+    
   
     function setAccountsContract(address addr) public{
          AccountsContract = addr;
@@ -96,7 +100,7 @@ contract Save{
         return (circleLimit,targetamount,installmentAmount,noOfInstallments,noOfparticipants,noOfParticipantsJoined);
     }
     function joinFund() public {
-        require(noOfParticipantsJoined < noOfparticipants);
+        require(noOfParticipantsJoined <= noOfparticipants);
         require(participants[msg.sender] != true);
         require(CircleStatus == Status.Active);
         Accounts acc = Accounts(AccountsContract);
@@ -179,5 +183,9 @@ contract Save{
     function Lockcircle() public {
         require(LowestBid == targetamount);
         CircleStatus = Status.Locked;
+    }
+    
+    function GrantAccess() public {
+        CircleStatus = Status.Active;
     }
 }
