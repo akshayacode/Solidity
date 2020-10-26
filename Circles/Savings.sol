@@ -71,8 +71,8 @@ contract Save{
     function changeCircleLimt(uint _circleLimit)  public  {
         changeCircleLimit = _circleLimit;
         // Notofication should go to manager
-        Accounts acc = Accounts(AccountsContract);
-        acc.transfer(msg.sender,defaultAddress,circleLimit);
+        // Accounts acc = Accounts(AccountsContract);
+        // acc.transfer(msg.sender,defaultAddress,circleLimit);
     }
     
     function Agree() public isParticipant {
@@ -87,8 +87,8 @@ contract Save{
         if(numagree >= maxagree)
         {
           circleLimit = changeCircleLimit;
-          Accounts acc = Accounts(AccountsContract);
-          acc.transfer(msg.sender,defaultAddress,circleLimit);  
+        //   Accounts acc = Accounts(AccountsContract);
+        //   acc.transfer(msg.sender,defaultAddress,circleLimit);  
         }
     }
     
