@@ -51,7 +51,7 @@ contract CirclesContract {
         
     }
     mapping(uint => LoanApplication) public applications;
-    uint numapplications;
+    uint public  numapplications;
     
     mapping(address => bool) hasOngoingLoan;
     mapping(address => bool) hasOngoingApplication;
@@ -168,8 +168,10 @@ contract CirclesContract {
     function releaseLoan(address addr,uint id,uint appId) public {
         Accounts acc = Accounts(AccountsContract);
         //balances[applications[appId].borrower] += applications[appId].credit_amount * 40/100;
-        uint initialamount = applications[appId].credit_amount * 40/100;
-        acc.transfer(borrwers[addr].circles[id].locker,borrwers[addr].circles[id].borrower,initialamount);
+        //uint initialamount = applications[appId].credit_amount * 40/100;
+        
+        //full amount is granted to the borrower
+        acc.transfer(borrwers[addr].circles[id].locker,borrwers[addr].circles[id].borrower,applications[appId].credit_amount);
 
         // Populate loan object
         loans[numLoans] = Loan(true, numLoans, borrwers[addr].circles[id].borrower, borrwers[addr].circles[id].investor, applications[appId].start_interest_rate, applications[appId].duration,
@@ -180,6 +182,12 @@ contract CirclesContract {
         hasOngoingLoan[borrwers[addr].circles[id].borrower] = true;
         applications[appId].status = Status.Disbursed;
     }
+    
+    function payMonthlyEMI(address addr,uint id,uint EMI_amount) public payable {
+        Accounts acc = Accounts(AccountsContract);
+        acc.transfer(msg.sender,borrwers[addr].circles[id].locker,EMI_amount);
+    }
+
     function PaytoInvestor(address addr,uint id,uint EMI) public payable {
         address payer = borrwers[addr].circles[id].locker;
         Accounts acc = Accounts(AccountsContract);
