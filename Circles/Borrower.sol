@@ -141,7 +141,7 @@ contract CirclesContract {
     }
     
     function changeCircleLimit(address addr,uint id) public {
-        uint numparticipants =  borrwers[addr].circles[id].partcipantList[id].circleMember.length;  
+        uint numparticipants =  borrwers[addr].circles[id].partcipantList[id].agreeForCircleLimit.length;  
         uint maxagree = borrwers[addr].circles[id].partcipantList[id].circleMember.length * 80/100;
         if( maxagree >= numparticipants)
         {
