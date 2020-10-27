@@ -90,6 +90,8 @@ contract CirclesContract {
         borrwers[msg.sender].circles[id].locker = address(uint160(uint(keccak256(abi.encodePacked(block.timestamp)))));
         Accounts acc = Accounts(AccountsContract);
         acc.transfer(msg.sender,borrwers[msg.sender].circles[id].locker ,circleLimit);
+        borrwers[msg.sender].circles[id].partcipantList[id].circleMember.push(msg.sender);
+        borrwers[msg.sender].circles[id].countParticipant++;
         
     }
     
