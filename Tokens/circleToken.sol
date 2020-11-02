@@ -1,3 +1,4 @@
+//"SPDX-License-Identifier: UNLICENSED"
 pragma solidity ^0.7.0;
 
 
@@ -27,17 +28,15 @@ library SafeMath {
     }
 }
 
-/**
- * Welcome to the Telegram chat https://devsolidity.io/
- */
-contract Token {
+
+abstract contract Token {
     uint256 public totalSupply;
 
-    function balanceOf(address who) public view returns (uint256);
-    function transfer(address to, uint256 value) public returns (bool);
-    function allowance(address owner, address spender) public view returns (uint256);
-    function transferFrom(address from, address to, uint256 value) public returns (bool);
-    function approve(address spender, uint256 value) public returns (bool);
+    function balanceOf(address who) public virtual returns (uint256);
+    function transfer(address to, uint256 value) public virtual returns (bool);
+    function allowance(address owner, address spender) public virtual returns (uint256);
+    function transferFrom(address from, address to, uint256 value) public virtual returns (bool);
+    function approve(address spender, uint256 value) public virtual returns (bool);
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -53,7 +52,7 @@ contract StandardToken is Token {
     * @param _to The address to transfer to.
     * @param _value The amount to be transferred.
     */
-    function transfer(address _to, uint256 _value) public returns (bool) {
+    function transfer(address _to, uint256 _value) public override returns (bool) {
         require(_to != address(0));
         require(balances[msg.sender] >= _value && balances[_to].add(_value) >= balances[_to]);
 
@@ -64,12 +63,8 @@ contract StandardToken is Token {
         return true;
     }
 
-    /**
-    * @dev Gets the balance of the specified address.
-    * @param _owner The address to query the the balance of.
-    * @return An uint256 representing the amount owned by the passed address.
-    */
-    function balanceOf(address _owner) public view returns (uint256 balance) {
+  
+    function balanceOf(address _owner) public override view returns (uint256 balance) {
         return balances[_owner];
     }
 
@@ -80,7 +75,7 @@ contract StandardToken is Token {
     * @param _to address The address which you want to transfer to
     * @param _value uint256 the amount of tokens to be transferred
     */
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+    function transferFrom(address _from, address _to, uint256 _value) public override returns (bool) {
         require(_to != address(0));
         require(_value <= allowed[_from][msg.sender]);
 
@@ -102,20 +97,15 @@ contract StandardToken is Token {
     * @param _spender The address which will spend the funds.
     * @param _value The amount of tokens to be spent.
     */
-    function approve(address _spender, uint256 _value) public returns (bool) {
+    function approve(address _spender, uint256 _value) public override returns (bool) {
         allowed[msg.sender][_spender] = _value;
 
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
-    /**
-    * @dev Function to check the amount of tokens that an owner allowed to a spender.
-    * @param _owner address The address which owns the funds.
-    * @param _spender address The address which will spend the funds.
-    * @return A uint256 specifying the amount of tokens still available for the spender.
-    */
-    function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
+ 
+    function allowance(address _owner, address _spender) public override view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
 
@@ -153,7 +143,7 @@ contract CircleContract is StandardToken {
     uint256 public constant INITIAL_SUPPLY = 88888888 * (10**decimals);
     address public tokenWallet;
 
-    constructor() public {
+    constructor() {
         totalSupply = INITIAL_SUPPLY;
         tokenWallet = msg.sender;
         balances[tokenWallet] = totalSupply;
