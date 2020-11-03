@@ -2,13 +2,27 @@
 
       connect with injected web3
       
+ ![metamask](https://user-images.githubusercontent.com/37238867/97951793-5bbdef80-1dc1-11eb-9a01-11c28b333afc.PNG)
+      
       deploy contract
+      
+ ![deploy](https://user-images.githubusercontent.com/37238867/97951799-61b3d080-1dc1-11eb-9e3b-b1bc890c605d.PNG)
       
       Choose -> Add Token -> Custom token -> enter contract address and the symbol and decimals will be automatically updated
       
+ ![custom_token](https://user-images.githubusercontent.com/37238867/97951810-65dfee00-1dc1-11eb-9d7d-d24222090131.PNG)
+      
       add Token
       
-      send token to other accounts
+  ![add tokens](https://user-images.githubusercontent.com/37238867/97951814-69737500-1dc1-11eb-9e15-11bd29d9c554.PNG)
+      
+  ![token_added](https://user-images.githubusercontent.com/37238867/97951821-6d9f9280-1dc1-11eb-8a6d-d8be6a77bf70.PNG)
+      
+       send token to other accounts
+       
+  ![send_token](https://user-images.githubusercontent.com/37238867/97951824-71331980-1dc1-11eb-8946-d5a75feb3562.PNG)
+      
+  ![token_sent](https://user-images.githubusercontent.com/37238867/97951838-7a23eb00-1dc1-11eb-96ce-5271e4359673.PNG)
 
 ## name
 
