@@ -1,3 +1,15 @@
+# Steps To Run
+
+      connect with injected web3
+      
+      deploy contract
+      
+      Choose -> Add Token -> Custom token -> enter contract address and the symbol and decimals will be automatically updated
+      
+      add Token
+      
+      send token to other accounts
+
 ## name
 
 Returns the name of the token - e.g. "MyToken".
