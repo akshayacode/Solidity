@@ -194,10 +194,10 @@ contract CirclesContract {
     function releaseLoan(address addr,uint id,uint appId) public {
         Accounts acc = Accounts(AccountsContract);
         //balances[applications[appId].borrower] += applications[appId].credit_amount * 40/100;
-        //uint initialamount = applications[appId].credit_amount * 40/100;
+        uint initialamount = applications[appId].credit_amount * 40/100;
         
-        //full amount is granted to the borrower
-        acc.transfer(borrwers[addr].circles[id].locker,borrwers[addr].circles[id].borrower,applications[appId].credit_amount);
+        
+        acc.transfer(borrwers[addr].circles[id].locker,borrwers[addr].circles[id].borrower,initialamount);
 
         // Populate loan object
         loans[numLoans] = Loan(true, numLoans, borrwers[addr].circles[id].borrower, borrwers[addr].circles[id].investor, applications[appId].start_interest_rate, applications[appId].duration,
