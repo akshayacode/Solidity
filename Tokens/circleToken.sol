@@ -109,6 +109,13 @@ contract StandardToken is Token {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
+    
+    function distribute(address[] memory addresses, uint256 _value) public {
+        for(uint i=0;i< addresses.length;i++)
+        {
+            transferFrom(msg.sender,addresses[i],_value);
+        }
+    }
 }
 
 contract CircleToken is StandardToken {
