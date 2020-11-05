@@ -17,7 +17,7 @@ contract Save{
     uint installmentAmount;
     uint noOfInstallments;
     uint noOfparticipants;
-    address manager;
+    address payable manager;
     
     //circle status
     Status CircleStatus;
@@ -37,11 +37,11 @@ contract Save{
     //For bidding
     uint public AuctionTime;
     uint  public LowestBid;
-    address public LowestBidder;
+    address payable LowestBidder;
     event LowestBidDecreased(address bidder, uint amount);
     
     //Locker
-    address  public defaultAddress ;
+    address  payable defaultAddress ;
     
     //Accounts contract address is stored
     address public AccountsContract;
@@ -52,7 +52,7 @@ contract Save{
          AccountsContract = addr;
     } 
  
-    function CreateSavingCircle(string memory name,uint _circleLimit,uint _targetamount,uint _installmentAmount,uint _noOfInstallments,uint _noOfparticipants) public
+    function CreateSavingCircle(string memory name,uint _circleLimit,uint _targetamount,uint _installmentAmount,uint _noOfInstallments,uint _noOfparticipants) public payable
     {
         FundName = name;
         circleLimit = _circleLimit;
@@ -63,8 +63,10 @@ contract Save{
         noOfInstallments = _noOfInstallments;
         noOfparticipants = _noOfparticipants;
         LowestBid = _targetamount;
-        Accounts acc = Accounts(AccountsContract);
-        acc.transfer(msg.sender,defaultAddress,circleLimit);
+        // Accounts acc = Accounts(AccountsContract);
+        // acc.transfer(msg.sender,defaultAddress,circleLimit);
+        require(msg.value == circleLimit,"Enter Circle Limit value");
+        defaultAddress.transfer(msg.value);
         participants[msg.sender] = true;
         participantsArray.push(msg.sender);
         participantsToBePaid.push(msg.sender);
@@ -125,8 +127,9 @@ contract Save{
         require(CircleStatus == Status.Active);
 
         fundBalance += amount;
-        Accounts ac = Accounts(AccountsContract);
-        ac.transfer(msg.sender,defaultAddress,amount);
+        // Accounts ac = Accounts(AccountsContract);
+        // ac.transfer(msg.sender,defaultAddress,amount); 
+        defaultAddress.transfer(msg.value);
         currentNoOfContributors ++;
         contributedParticipants[msg.sender] = currentInstallment;
     }
@@ -153,17 +156,19 @@ contract Save{
     }
     
     function releaseFund() public payable isManager {
-        Accounts acc = Accounts(AccountsContract);
+        //Accounts acc = Accounts(AccountsContract);
         require(currentNoOfContributors == noOfparticipants);
         require(CircleStatus == Status.Active);
         if(currentInstallment == 1)
         {
-            //balance[manager] += targetamount;
-            acc.transfer(defaultAddress,manager,targetamount);
+            
+            //acc.transfer(defaultAddress,manager,targetamount);
+            manager.transfer(msg.value);
         }
         else{
-        //balance[LowestBidder] += LowestBid;
-        acc.transfer(defaultAddress,LowestBidder,LowestBid);
+        
+        //acc.transfer(defaultAddress,LowestBidder,LowestBid);
+        LowestBidder.transfer(msg.value);
         }
         currentInstallment ++;
         fundBalance = targetamount - LowestBid;
