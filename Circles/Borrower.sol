@@ -21,7 +21,7 @@ contract CirclesContract {
         uint circleLimit;
         uint changeCircleLimit;
         uint countParticipant;
-        address investor;
+        address payable investor;
         mapping(uint => participants) partcipantList;
        
         
@@ -185,7 +185,7 @@ contract CirclesContract {
         
     }
     
-    function selectInvestor(address addr,uint id,address investor_address,uint appId) public {
+    function selectInvestor(address addr,uint id,address payable investor_address,uint appId) public {
         borrwers[addr].circles[id].investor = investor_address;
         applications[appId].status = Status.Shortlisted;
     }
@@ -222,12 +222,17 @@ contract CirclesContract {
         require(sent,"Failed to send Ether");
     }
 
-    function PaytoInvestor(address addr,uint id,uint EMI) public payable {
+    // function PaytoInvestor(address addr,uint id,uint EMI) public payable {
         
-        // locker to investor
-        address payer = borrwers[addr].circles[id].locker;
-        Accounts acc = Accounts(AccountsContract);
-        acc.transfer(payer,borrwers[addr].circles[id].investor,EMI);
+    //     // locker to investor
+    //     address payer = borrwers[addr].circles[id].locker;
+    //     Accounts acc = Accounts(AccountsContract);
+    //     acc.transfer(payer,borrwers[addr].circles[id].investor,EMI);
+    // }
+    
+    function PaytoInvestor(address addr,uint id) public payable{
+        bool sent = borrwers[addr].circles[id].investor.send(msg.value); //while using web3 decalre from address as locker
+        require(sent,"Failed to send Ether");
     }
 
 
