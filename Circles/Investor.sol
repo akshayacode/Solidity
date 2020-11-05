@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT;
 pragma solidity ^0.7.0;
 
-import "./Accounts.sol";
 import './Circle.sol'; // import borrower. sol
 contract InvestorContract {
  
@@ -11,9 +10,9 @@ contract InvestorContract {
     
     address public contractaddr;
 
-    function setcontractaddr(address borrower, address account) public   {
+    function setcontractaddr(address borrower) public   {
       contractaddr = borrower;
-      AccountsContractAddress = account;
+      
    
     }
  
@@ -62,14 +61,16 @@ contract InvestorContract {
    
     function grantloan(address addr,uint index) public payable {
         require(investors[msg.sender].EXISTS == true);
-        Accounts acc = Accounts(AccountsContractAddress);
         CirclesContract cbwr = CirclesContract(contractaddr);
         uint amount = cbwr.getCreditAmount(index);
-        address beneficiary = cbwr.getlocker(addr,index);
+        address payable beneficiary = cbwr.getlocker(addr,index);
         require(hasOngoingInvestment[msg.sender] == false);
-        acc.transfer(msg.sender,beneficiary,amount);
+        require(msg.value == amount);
+        bool sent = beneficiary.send(msg.value);
+        require(sent,"Failed to send Ether");
+        //beneficiary.transfer(amount);
         hasOngoingInvestment[msg.sender] = true;
-        //cbwr.changestatusApproved(addr,index);
+        
         investors[msg.sender].status = InvestorStatus.Debited;
     }
 
