@@ -16,7 +16,7 @@ contract CirclesContract {
     struct Circle{
         string name;
         address manager;
-        address borrower;
+        address payable borrower;
         address payable locker;
         uint circleLimit;
         uint changeCircleLimit;
@@ -82,14 +82,17 @@ contract CirclesContract {
     }
     
     
-    function createCircle(uint id,string memory name,uint circleLimit) public{
+    function createCircle(uint id,string memory name,uint circleLimit) public payable{
         borrwers[msg.sender].borrower = msg.sender;
         borrwers[msg.sender].circles[id].name= name;
         borrwers[msg.sender].circles[id].circleLimit = circleLimit;
         borrwers[msg.sender].circles[id].manager = msg.sender;
         borrwers[msg.sender].circles[id].locker = address(uint160(uint(keccak256(abi.encodePacked(block.timestamp)))));
-        Accounts acc = Accounts(AccountsContract);
-        acc.transfer(msg.sender,borrwers[msg.sender].circles[id].locker ,circleLimit);
+        // Accounts acc = Accounts(AccountsContract);
+        // acc.transfer(msg.sender,borrwers[msg.sender].circles[id].locker ,circleLimit);
+        require(msg.value == circleLimit,"Circle Limit and Value differs");
+        bool sent = borrwers[msg.sender].circles[id].locker.send(msg.value);
+        require(sent,"Failed to send cirle Limit Ether");
         borrwers[msg.sender].circles[id].partcipantList[id].circleMember.push(msg.sender);
         borrwers[msg.sender].circles[id].countParticipant++;
         
@@ -154,7 +157,7 @@ contract CirclesContract {
         return applications[id].credit_amount;
     }
     
-    function getlocker(address addr,uint id) public view returns (address) {
+    function getlocker(address addr,uint id) public view returns (address payable) {
         return borrwers[addr].circles[id].locker;
     }
     
