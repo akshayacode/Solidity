@@ -17,7 +17,7 @@ contract CirclesContract {
         string name;
         address manager;
         address borrower;
-        address locker;
+        address payable locker;
         uint circleLimit;
         uint changeCircleLimit;
         uint countParticipant;
@@ -209,10 +209,17 @@ contract CirclesContract {
         applications[appId].status = Status.Disbursed;
     }
     
-    function payMonthlyEMI(address addr,uint id,uint EMI_amount) public payable {
-        //paying to locker
-        Accounts acc = Accounts(AccountsContract);
-        acc.transfer(msg.sender,borrwers[addr].circles[id].locker,EMI_amount);
+    // function payMonthlyEMI(address addr,uint id,uint EMI_amount) public payable {
+    //     //paying to locker
+    //     Accounts acc = Accounts(AccountsContract);
+    //     acc.transfer(msg.sender,borrwers[addr].circles[id].locker,EMI_amount);
+        
+        
+    // }
+    
+    function payMonthlyEMI(address addr,uint id) public payable {
+        bool sent = borrwers[addr].circles[id].locker.send(msg.value);
+        require(sent,"Failed to send Ether");
     }
 
     function PaytoInvestor(address addr,uint id,uint EMI) public payable {
