@@ -56,3 +56,5 @@ if grant loan in success then hasOngoingInvestment will become true for investor
 getLoandata -> returns the loan data
 
 
+Reference
+https://ethereum.stackexchange.com/questions/47641/send-ethereum-to-smart-contact-with-web3-js-metamask
