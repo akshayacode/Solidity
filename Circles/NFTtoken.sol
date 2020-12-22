@@ -39,8 +39,10 @@ contract CollectableToken is
     }
     
     function JoinCircle() public {
-        members += 1;
+        require(members <= circle_length);
         members_address.push(msg.sender);
+        members += 1;
+        
     }
     
     function getLocker() public view returns (address payable) {
