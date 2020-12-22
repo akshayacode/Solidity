@@ -48,7 +48,10 @@ contract CollectableToken is
     function getLocker() public view returns (address payable) {
         return lockerAddress;
     }
-  
+    
+    function buyAsset() public payable {
+        lockerAddress.transfer(msg.value);
+    }
   /**
    * @dev Mints a new NFT.
    * @param _to The address that will own the minted NFT.
