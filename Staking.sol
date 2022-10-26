@@ -3,6 +3,8 @@ pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/interfaces/IERC20.sol";
+import "./BetToken.sol";
 
 contract FlexibleStaking is ReentrancyGuard, Ownable {
     uint256 public MIN_STAKE_AMOUNT = 0;
@@ -25,8 +27,13 @@ contract FlexibleStaking is ReentrancyGuard, Ownable {
     mapping(address => Staker) public stakers;
     address[] public stakerList;
     address[] private auxArray;
+    BetToken betToken;
 
-    constructor(uint256 _min_stake_amount) payable ReentrancyGuard() {
+    constructor(uint256 _min_stake_amount, BetToken _pmknToken)
+        payable
+        ReentrancyGuard()
+    {
+        betToken = _pmknToken;
         MIN_STAKE_AMOUNT = _min_stake_amount;
     }
 
@@ -52,12 +59,13 @@ contract FlexibleStaking is ReentrancyGuard, Ownable {
                 RemoveStake(user);
             }
         }
+        delete stakerList;
     }
 
-    function Stake() external payable nonReentrant {
+    function Stake(uint256 amount) external payable nonReentrant {
         require(msg.value >= MIN_STAKE_AMOUNT, MIN_CONTRIBUTION);
-        uint256 amount = msg.value;
         address user = msg.sender;
+        betToken.transferFrom(msg.sender, address(this), amount);
 
         if (isStakerExists(user)) {
             uint256 yieldTotal = calculateYieldTotal(user);
@@ -82,28 +90,32 @@ contract FlexibleStaking is ReentrancyGuard, Ownable {
         if (!isStakerExists(user)) {
             revert(NEVER_CONTRIBUTED);
         }
-        uint256 uns = stakers[user].contribution +stakers[user].previous_contribution ;
+        uint256 uns = stakers[user].contribution +
+            stakers[user].previous_contribution;
         require(uns > 0, "Zero balance");
         uint256 yieldTotal = calculateYieldTotal(user);
         uint256 totalReward = uns + yieldTotal;
         stakers[user].contribution = 0;
         stakers[user].joined = 0;
         stakerList = remove(user, stakerList);
-        payable(user).transfer(totalReward);
+        delete auxArray;
+        betToken.transfer(user, totalReward);
     }
 
     function RemoveStake(address user) private {
         if (!isStakerExists(user)) {
             revert(NEVER_CONTRIBUTED);
         }
-        uint256 uns = stakers[user].contribution +stakers[user].previous_contribution ;
+        uint256 uns = stakers[user].contribution +
+            stakers[user].previous_contribution;
         require(uns > 0, "Zero balance");
         uint256 yieldTotal = calculateYieldTotal(user);
         uint256 totalReward = uns + yieldTotal;
         stakers[user].contribution = 0;
         stakers[user].joined = 0;
         stakerList = remove(user, stakerList);
-        payable(user).transfer(totalReward);
+        delete auxArray;
+        betToken.transfer(user, totalReward);
     }
 
     function calculateYieldTime(address user) public view returns (uint256) {
