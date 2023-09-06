@@ -1,0 +1,92 @@
+----------- reentrancy attack ------------
+
+A reentrancy attack occurs when a malicious contract exploits a vulnerable contract by calling its functions in a way that allows the attacker to repeatedly enter the contract and manipulate its state before the initial function call is completed.
+
+---------- Security Patterns in solidity ----
+
+
+1) Checks-Effects-Interactions Pattern,
+2) Reentrancy Guard, 
+3) Pullpayment (withdrawal) Pattern,
+4) Pausable Pattern,
+5) Rate Limiting Pattern,
+6) Speed Bump Pattern.
+
+
+------------- Check Effects interaction pattern
+
+If a contract does not follow the Checks-Effects-Interactions Pattern, it may be vulnerable to reentrancy attacks.
+
+CHECKS: Ensure that the user has a sufficient balance to withdraw the requested amount using the require statement.
+EFFECTS: Update the user’s balance by subtracting the requested withdrawal amount.
+INTERACTIONS: Transfer the requested amount to the user’s address using a low-level call function. The success of the transfer is checked using another require statement to ensure the withdrawal was successful.
+
+
+----------- Reentrancy guard
+
+The OpenZeppelin ReentrancyGuard contract is a security library that helps prevent reentrancy attacks by using a mutex-like mechanism. It ensures that a contract function protected by the ReentrancyGuard cannot be re-entered while it is being executed
+
+modifier nonReentrant() {
+        require(_status != LOCKED, "ReentrancyGuard: reentrant call");
+        _status = LOCKED;
+        _;
+        _status = UNLOCKED;
+    }
+	
+----------- 3. Pullpayment (withdrawal) pattern
+
+The OpenZeppelin PullPayment contract is a pattern that allows users to "pull" their payments from a contract instead of the contract "pushing" payments out to the users. This pattern helps avoid the pitfalls of directly sending ether during contract execution, which could be susceptible to reentrancy attacks or other vulnerabilities.
+
+
+msg.value to enter the raffle
+_asyncTransfer(winner, winnings); is used to withdraw the winning, where the fund is locked in escrow
+
+
+----------- 4. Pausable pattern
+
+
+The OpenZeppelin Pausable contract is a simple and effective way to add "pause" functionality to your smart contract, allowing the contract owner to halt certain operations temporarily in case of any emergency or issue. The contract owner can then resume the contract's operations when the issue is resolved.
+
+
+----------- 5. Rate limiting pattern
+
+The Rate Limiting design pattern is a security measure used in smart contracts to limit the number of times a function can be executed within a specific time frame. This pattern helps prevent spamming, abuse, and potential attacks like Denial of Service (DoS)
+
+modifier rateLimited() {
+        if (block.timestamp >= lastCallTimestamp + TIME_WINDOW) {
+            // Time window elapsed, reset counter and lastCallTimestamp
+            counter = 0;
+            lastCallTimestamp = block.timestamp;
+        }
+
+        require(counter < LIMIT, "RateLimited: Limit reached");
+        _;
+        counter++;
+    }
+	
+Time window: A predefined period during which the number of function calls is limited. It could be in seconds, minutes, hours, or any other unit of time. The time window is used to track the usage and reset the counter after the window has elapsed.
+Limit: The maximum number of function calls allowed within the time window. Once the limit is reached, any further attempts to call the function within the same time window will be rejected.
+Counter: A variable to keep track of the number of function calls made within the time window.
+Timestamp: A variable to store the timestamp of the last function call. It is used to determine when the time window has elapsed and reset the counter.
+Modifier or function: A modifier or a separate function can be used to enforce the rate limiting. It checks whether the time window has elapsed, and if not, it checks whether the limit has been reached.
+
+
+----------  Speed bump pattern
+
+The Speed Bump design pattern is a security measure used in smart contracts to help prevent malicious activities or unintended consequences by delaying certain actions. The idea is to introduce a waiting period between the initiation of a specific action and its execution, giving users or contract administrators time to react and potentially cancel or modify the action if necessary.
+
+The pattern is particularly useful when dealing with irreversible actions, like transferring funds, updating critical contract parameters, or making governance decisions. The waiting period can help prevent exploits, front-running, or any unintended consequences of the action by allowing stakeholders to review the transaction and intervene if necessary.
+
+Refernce : https://medium.com/coinmonks/security-patterns-208394299142
+
+
+------- Approximately, how large can a smart contract be?
+
+Answer: The Solidity max contract size is 24,576 bytes. This contract code size limit was introduced in EIP-170 with the Spurious Dragon hard-fork. The purpose of this limit is to prevent denial-of-service (DOS) attacks.
+
+https://medium.com/@fbyrd/rareskills-solidity-interview-question-3-answered-c94111942bfd
+
+
+Solidity interview questions
+
+https://www.rareskills.io/post/solidity-interview-questions
